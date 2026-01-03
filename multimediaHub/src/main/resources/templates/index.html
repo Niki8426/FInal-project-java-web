@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Начало | Multimedia Hub</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background: url('/images/register.jpg') no-repeat center center/cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .center-box {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 260px;
+      text-align: center;
+    }
+
+    .main-btn {
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: 0.3s ease;
+    }
+
+    .main-btn:hover {
+      background: rgba(255,255,255,0.35);
+    }
+
+    h1 {
+      color: white;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(0,0,0,0.7);
+      font-size: 30px;
+      letter-spacing: 1px;
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="center-box">
+
+  <h1>Multimedia Hub</h1>
+
+  <a th:href="@{/login}">
+    <button class="main-btn">Вход</button>
+  </a>
+
+  <a th:href="@{/register}">
+    <button class="main-btn">Регистрация</button>
+  </a>
+
+</div>
+
+</body>
+</html>

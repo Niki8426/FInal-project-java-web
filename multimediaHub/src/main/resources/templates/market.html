@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Market</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            min-height: 100vh;
+            background-image: url("/images/market.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(0,0,0,0.6);
+        }
+
+        .back-btn {
+            justify-self: start;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .balance {
+            justify-self: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* MAIN CONTAINER */
+        .market-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: rgba(0,0,0,0.65);
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .switch-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .switch-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 16px;
+        }
+
+        /* MEDIA LIST */
+        .media-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .media-item {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .media-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .media-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .media-meta {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        .media-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .buy-btn {
+            padding: 6px 14px;
+            background: #4caf50;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* DESCRIPTION TOOLTIP */
+        .description-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            width: 360px;
+            padding: 10px;
+            background: rgba(0,0,0,0.9);
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
+            z-index: 10;
+        }
+
+        .media-item:hover .description-tooltip {
+            display: block;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <a th:href="@{/home}" class="back-btn">← Back</a>
+
+    <div class="balance">
+        Balance: <span th:text="${user.balance}">0.00</span> лв.
+    </div>
+
+    <div></div>
+</div>
+
+<!-- MARKET -->
+<div class="market-container">
+
+    <div class="switch-buttons">
+        <button onclick="showMusic()">Music</button>
+        <button onclick="showMovies()">Movies</button>
+    </div>
+
+    <!-- MUSIC -->
+    <ul class="media-list" id="musicList">
+        <li th:if="${#lists.isEmpty(musicItems)}" class="empty">
+            Няма налична музика
+        </li>
+
+        <li class="media-item" th:each="m : ${musicItems}">
+            <div class="media-info">
+                <div class="media-title" th:text="${m.title}">Title</div>
+                <div class="media-meta" th:if="${m.genre != null}">
+                    Genre: <span th:text="${m.genre}"></span>
+                </div>
+                <div class="media-meta">
+                    Year: <span th:text="${m.year}"></span>
+                </div>
+            </div>
+
+            <div class="media-actions">
+                <span th:text="${m.price}">0</span> лв.
+                <button class="buy-btn">Buy</button>
+            </div>
+
+            <div class="description-tooltip" th:text="${m.description}">
+                Description
+            </div>
+        </li>
+    </ul>
+
+    <!-- MOVIES -->
+    <ul class="media-list" id="movieList" style="display:none">
+        <li th:if="${#lists.isEmpty(movieItems)}" class="empty">
+            Няма налични филми
+        </li>
+
+        <li class="media-item" th:each="m : ${movieItems}">
+            <div class="media-info">
+                <div class="media-title" th:text="${m.title}">Title</div>
+                <div class="media-meta" th:if="${m.genre != null}">
+                    Genre: <span th:text="${m.genre}"></span>
+                </div>
+                <div class="media-meta">
+                    Year: <span th:text="${m.year}"></span>
+                </div>
+            </div>
+
+            <div class="media-actions">
+                <span th:text="${m.price}">0</span> лв.
+                <button class="buy-btn">Buy</button>
+            </div>
+
+            <div class="description-tooltip" th:text="${m.description}">
+                Description
+            </div>
+        </li>
+    </ul>
+
+</div>
+
+<script>
+    function showMusic() {
+        document.getElementById("musicList").style.display = "block";
+        document.getElementById("movieList").style.display = "none";
+    }
+
+    function showMovies() {
+        document.getElementById("musicList").style.display = "none";
+        document.getElementById("movieList").style.display = "block";
+    }
+
+    showMusic();
+</script>
+
+</body>
+</html>

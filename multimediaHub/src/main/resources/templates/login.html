@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+
+            /* Background image */
+            background: url('/images/login.jpg') no-repeat center center fixed;
+            background-size: cover;
+
+            /* Center content */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            height: 100vh;
+        }
+
+        .login-box {
+            width: 360px;
+
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            padding: 30px 35px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.35);
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+        }
+
+        label {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input.error {
+            border-color: #ff4444;
+        }
+
+        .error-message {
+            color: #ffaaaa;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .register-link a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h2>Вход</h2>
+
+    <form th:action="@{/login}" method="post" th:object="${loginBindingModel}">
+
+        <!-- USERNAME -->
+        <div class="form-group">
+            <label for="username">Потребителско име</label>
+            <input type="text" id="username" th:field="*{username}"
+                   th:classappend="${#fields.hasErrors('username')} ? 'error'">
+            <div class="error-message" th:errors="*{username}"></div>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="form-group">
+            <label for="password">Парола</label>
+            <input type="password" id="password" th:field="*{password}"
+                   th:classappend="${#fields.hasErrors('password')} ? 'error'">
+            <div class="error-message" th:errors="*{password}"></div>
+        </div>
+
+        <button type="submit">Вход</button>
+    </form>
+
+    <div class="register-link">
+        <p>Нямаш акаунт? <a th:href="@{/register}">Регистрация</a></p>
+    </div>
+
+</div>
+
+</body>
+</html>

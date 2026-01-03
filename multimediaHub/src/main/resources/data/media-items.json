@@ -1,0 +1,142 @@
+[
+  {
+    "title": "The Weeknd - Starboy ft. Daft Punk",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2016,
+    "genre": "R&B/Pop",
+    "imageUrl": "https://img.youtube.com/vi/34Na4j8AVgA/maxresdefault.jpg",
+    "description": "Official music video for Starboy by The Weeknd featuring Daft Punk.",
+    "youtubeVideoId": "34Na4j8AVgA"
+  },
+  {
+    "title": "Ed Sheeran - Perfect",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2017,
+    "genre": "Pop/Ballad",
+    "imageUrl": "https://img.youtube.com/vi/2Vv-BfVoq4g/maxresdefault.jpg",
+    "description": "Official music video for Perfect by Ed Sheeran.",
+    "youtubeVideoId": "2Vv-BfVoq4g"
+  },
+  {
+    "title": "Mark Ronson - Uptown Funk ft. Bruno Mars",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2014,
+    "genre": "Funk/Pop",
+    "imageUrl": "https://img.youtube.com/vi/OPf0YbXqDm0/maxresdefault.jpg",
+    "description": "Official music video for Uptown Funk by Mark Ronson ft. Bruno Mars.",
+    "youtubeVideoId": "OPf0YbXqDm0"
+  },
+  {
+    "title": "Billie Eilish, Khalid - lovely",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2018,
+    "genre": "Alternative/Indie",
+    "imageUrl": "https://img.youtube.com/vi/V1Pl8CzNzCw/maxresdefault.jpg",
+    "description": "Official music video for lovely by Billie Eilish and Khalid.",
+    "youtubeVideoId": "V1Pl8CzNzCw"
+  },
+  {
+    "title": "Major Lazer & DJ Snake - Lean On (feat. MØ)",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2015,
+    "genre": "Electronic/Dance",
+    "imageUrl": "https://img.youtube.com/vi/YqeW9_5kURI/maxresdefault.jpg",
+    "description": "Official music video for Lean On by Major Lazer & DJ Snake.",
+    "youtubeVideoId": "YqeW9_5kURI"
+  },
+  {
+    "title": "Dua Lipa - New Rules",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2017,
+    "genre": "Pop",
+    "imageUrl": "https://img.youtube.com/vi/k2qgadSvNyU/maxresdefault.jpg",
+    "description": "Official music video for New Rules by Dua Lipa.",
+    "youtubeVideoId": "k2qgadSvNyU"
+  },
+  {
+    "title": "DJ Snake ft. Justin Bieber - Let Me Love You",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2016,
+    "genre": "Electronic/Dance",
+    "imageUrl": "https://img.youtube.com/vi/SMs0GnYze34/maxresdefault.jpg",
+    "description": "Lyric video for Let Me Love You by DJ Snake ft. Justin Bieber.",
+    "youtubeVideoId": "SMs0GnYze34"
+  },
+  {
+    "title": "Katy Perry - Dark Horse ft. Juicy J",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2014,
+    "genre": "Pop/Trap",
+    "imageUrl": "https://img.youtube.com/vi/0KSOMA3QBU0/maxresdefault.jpg",
+    "description": "Official music video for Dark Horse by Katy Perry ft. Juicy J.",
+    "youtubeVideoId": "0KSOMA3QBU0"
+  },
+  {
+    "title": "Gotye - Somebody That I Used To Know ft. Kimbra",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2011,
+    "genre": "Art Pop/Indie",
+    "imageUrl": "https://img.youtube.com/vi/8UVNT4wvIGY/maxresdefault.jpg",
+    "description": "Official music video for Somebody That I Used To Know by Gotye.",
+    "youtubeVideoId": "8UVNT4wvIGY"
+  },
+  {
+    "title": "Ariana Grande ft. Nicki Minaj - Side To Side",
+    "type": "MUSIC",
+    "price": 1.5,
+    "year": 2016,
+    "genre": "Pop/Reggae-pop",
+    "imageUrl": "https://img.youtube.com/vi/SXiSVQZLje8/maxresdefault.jpg",
+    "description": "Official music video for Side To Side by Ariana Grande ft. Nicki Minaj.",
+    "youtubeVideoId": "SXiSVQZLje8"
+  },
+  {
+    "title": "Braven / Брейвън (2018)",
+    "type": "MOVIE",
+    "price": 8.0,
+    "year": 2018,
+    "genre": "Action/Thriller",
+    "imageUrl": "https://img.youtube.com/vi/jt3_Xux1uDA/maxresdefault.jpg",
+    "description": "Действието на филма се развива на границата между САЩ и Канада, където Джо Брейвън живее необезпокояван със семейството си. Но един ден живота му се променя след като се натъква на банда наркотрафиканти, които се укриват в горите от полицията.",
+    "youtubeVideoId": "jt3_Xux1uDA"
+  },
+  {
+    "title": "Tango & Cash / Танго и Кеш (1989)",
+    "type": "MOVIE",
+    "price": 10.0,
+    "year": 1989,
+    "genre": "Action/Comedy",
+    "imageUrl": "https://img.youtube.com/vi/iQjceymPg6U/maxresdefault.jpg",
+    "description": "Рей Танго (Сталоун) и Гейб Кеш (Кърт Ръсел) са ченгета в Лос Анджелис. Вечните съперници си приличат само по едно – всеки смята, че е най-добрият. Когато мафиотът Ив Парет ги вкарва в пандиза, те ще трябва да работят заедно...",
+    "youtubeVideoId": "iQjceymPg6U"
+  },
+  {
+    "title": "Parker / Паркър (2013)",
+    "type": "MOVIE",
+    "price": 8.0,
+    "year": 2013,
+    "genre": "Crime/Action",
+    "imageUrl": "https://img.youtube.com/vi/zlACLcrWaoc/maxresdefault.jpg",
+    "description": "Един ветеран-престъпник с безкомпромисен кодекс на честта търси отмъщение срещу жестоката банда, която го е измамила в ПАРКЪР, непреклонен съвременен филм ноар, развиващ се сред безподобния разкош и богатства на Палм Бийч.",
+    "youtubeVideoId": "zlACLcrWaoc"
+  },
+  {
+    "title": "Big Stan / Пълен затворник (2007)",
+    "type": "MOVIE",
+    "price": 10.0,
+    "year": 2007,
+    "genre": "Comedy",
+    "imageUrl": "https://img.youtube.com/vi/0xSLTWU0jxc/maxresdefault.jpg",
+    "description": "Брокерът Стан разбира, че ще влезе в затвора за измама и се паникьосва. Той наема мистериозният гуру, известен като Господарят, който да му помогне да овладее бойно изкуство, за да оцелее на топло.",
+    "youtubeVideoId": "0xSLTWU0jxc"
+  }
+]

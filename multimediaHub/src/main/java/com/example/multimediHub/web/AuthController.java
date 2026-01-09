@@ -17,8 +17,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.UUID;
 
 @org.springframework.stereotype.Controller
 public class AuthController {
@@ -85,13 +88,14 @@ public class AuthController {
 
     @GetMapping("/home")
     public ModelAndView home(@AuthenticationPrincipal UserData userData) {
+
         User user = userService.findUserById(userData.getUserId());
 
         ModelAndView mv = new ModelAndView("home");
-        mv.addObject("user", user);
-        mv.addObject("media", mediaItemService.getActiveMedia());
-        mv.addObject("musicItems", mediaItemService.getUserMusic(user));
-        mv.addObject("movieItems", mediaItemService.getUserMovies(user));
+        mv.addObject("musicList",
+                mediaItemService.getUserMusicForHome(user));
+        mv.addObject("movieList",
+                mediaItemService.getUserMoviesForHome(user));
 
         return mv;
     }
@@ -140,6 +144,16 @@ public class AuthController {
                 mediaItemService.getMarketItems(user, MediaType.MOVIE));
 
         return mv;
+    }
+
+    @PostMapping("/market/buy/{id}")
+    public String buyMedia(@PathVariable UUID id,
+                           @AuthenticationPrincipal UserData userData) {
+
+        User user = userService.findUserById(userData.getUserId());
+        mediaItemService.buyMedia(user, id);
+
+        return "redirect:/market";
     }
 
 

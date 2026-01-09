@@ -13,34 +13,33 @@
             background-image: url("/images/market.jpg");
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
         }
 
         /* TOP BAR */
         .top-bar {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
+            display: flex;
             align-items: center;
-            padding: 16px 24px;
+            justify-content: space-between;
+            padding: 14px 24px;
             background: rgba(0,0,0,0.6);
         }
 
         .back-btn {
-            justify-self: start;
-            padding: 8px 14px;
+            padding: 6px 12px;
             background: rgba(255,255,255,0.2);
             color: white;
             text-decoration: none;
             border-radius: 6px;
+            font-size: 14px;
+            width: fit-content;
         }
 
         .balance {
-            justify-self: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
         }
 
-        /* MAIN CONTAINER */
+        /* MAIN */
         .market-container {
             max-width: 900px;
             margin: 40px auto;
@@ -57,13 +56,13 @@
 
         .switch-buttons button {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             background: rgba(255,255,255,0.2);
             color: white;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         /* MEDIA LIST */
@@ -77,15 +76,9 @@
             position: relative;
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 10px;
+            gap: 12px;
             padding: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .media-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
         }
 
         .media-title {
@@ -106,14 +99,20 @@
 
         .buy-btn {
             padding: 6px 14px;
-            background: #4caf50;
-            border: none;
             border-radius: 6px;
-            color: white;
+            border: none;
             cursor: pointer;
+            background: #4caf50;
+            color: white;
         }
 
-        /* DESCRIPTION TOOLTIP */
+        .buy-btn:disabled {
+            background: gray;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* DESCRIPTION */
         .description-tooltip {
             position: absolute;
             bottom: 100%;
@@ -146,13 +145,12 @@
     <a th:href="@{/home}" class="back-btn">← Back</a>
 
     <div class="balance">
-        Balance: <span th:text="${user.balance}">0.00</span> лв.
+        Balance: <span th:text="${user.balance}">0</span> EUR
     </div>
 
     <div></div>
 </div>
 
-<!-- MARKET -->
 <div class="market-container">
 
     <div class="switch-buttons">
@@ -167,8 +165,8 @@
         </li>
 
         <li class="media-item" th:each="m : ${musicItems}">
-            <div class="media-info">
-                <div class="media-title" th:text="${m.title}">Title</div>
+            <div>
+                <div class="media-title" th:text="${m.title}"></div>
                 <div class="media-meta" th:if="${m.genre != null}">
                     Genre: <span th:text="${m.genre}"></span>
                 </div>
@@ -178,13 +176,17 @@
             </div>
 
             <div class="media-actions">
-                <span th:text="${m.price}">0</span> лв.
-                <button class="buy-btn">Buy</button>
+                <span th:text="${m.price}"></span> EUR
+
+                <form th:action="@{/market/buy/{id}(id=${m.id})}" method="post">
+                    <button class="buy-btn"
+                            th:disabled="${user.balance.compareTo(m.price) < 0}">
+                        Buy
+                    </button>
+                </form>
             </div>
 
-            <div class="description-tooltip" th:text="${m.description}">
-                Description
-            </div>
+            <div class="description-tooltip" th:text="${m.description}"></div>
         </li>
     </ul>
 
@@ -195,8 +197,8 @@
         </li>
 
         <li class="media-item" th:each="m : ${movieItems}">
-            <div class="media-info">
-                <div class="media-title" th:text="${m.title}">Title</div>
+            <div>
+                <div class="media-title" th:text="${m.title}"></div>
                 <div class="media-meta" th:if="${m.genre != null}">
                     Genre: <span th:text="${m.genre}"></span>
                 </div>
@@ -206,13 +208,17 @@
             </div>
 
             <div class="media-actions">
-                <span th:text="${m.price}">0</span> лв.
-                <button class="buy-btn">Buy</button>
+                <span th:text="${m.price}"></span> EUR
+
+                <form th:action="@{/market/buy/{id}(id=${m.id})}" method="post">
+                    <button class="buy-btn"
+                            th:disabled="${user.balance.compareTo(m.price) < 0}">
+                        Buy
+                    </button>
+                </form>
             </div>
 
-            <div class="description-tooltip" th:text="${m.description}">
-                Description
-            </div>
+            <div class="description-tooltip" th:text="${m.description}"></div>
         </li>
     </ul>
 

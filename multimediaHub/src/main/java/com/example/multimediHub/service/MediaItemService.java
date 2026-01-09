@@ -3,9 +3,13 @@ package com.example.multimediHub.service;
 import com.example.multimediHub.model.MediaItem;
 import com.example.multimediHub.model.MediaType;
 import com.example.multimediHub.repository.MediaItemRepository;
+import com.example.multimediHub.repository.UserRepository;
+import com.example.multimediHub.web.dto.MediaHome;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -23,27 +27,28 @@ import java.util.UUID;
 public class MediaItemService {
 
     private final MediaItemRepository mediaItemRepository;
+    private final UserRepository userRepository;
 
-    public MediaItemService(MediaItemRepository mediaItemRepository) {
+    public MediaItemService(MediaItemRepository mediaItemRepository,
+                            UserRepository userRepository) {
         this.mediaItemRepository = mediaItemRepository;
+        this.userRepository = userRepository;
     }
 
-    // ===== ACTIVE MEDIA (ако още се ползва) =====
+    // ===== ACTIVE MEDIA (по избор, може да се махне по-късно) =====
+    //ако искаш “последно пускано”
     public MediaItem getActiveMedia() {
-        return mediaItemRepository
-                .findFirstByCurrentTrue()
-                .orElse(null);
+        return mediaItemRepository.findFirstByCurrentTrue().orElse(null);
     }
 
     // ===== MARKET =====
-
-    public List<MediaItem> getMarketMusic(User user) {
-        return getMarketItems(user, MediaType.MUSIC);
-    }
-
-    public List<MediaItem> getMarketMovies(User user) {
-        return getMarketItems(user, MediaType.MOVIE);
-    }
+    //Показва какво МОЖЕ да купиш
+    //
+    //маха вече купените
+    //
+    //сортира по година (DESC)
+    //
+    //връща MediaItem (entity), защото има цена, жанр, година
 
     public List<MediaItem> getMarketItems(User user, MediaType type) {
 
@@ -59,23 +64,77 @@ public class MediaItemService {
         return mediaItemRepository.findMarketItems(type, ownedIds);
     }
 
-    // ===== USER LIBRARY =====
+    // ===== BUY =====
+    //Функционалност:
+    //
+    //проверка дали вече е купено
+    //
+    //проверка за баланс
+    //
+    //намалява баланса
+    //
+    //добавя медиата в user.ownedMedia
+    //
+    //при следващо влизане → няма да се показва в market
+    @Transactional
+    public boolean buyMedia(User user, UUID mediaId) {
 
-    public List<MediaItem> getUserMedia(User user, MediaType type) {
+        MediaItem media = mediaItemRepository.findById(mediaId)
+                .orElseThrow(() -> new IllegalArgumentException("Media not found"));
+
+        boolean alreadyOwned = user.getOwnedMedia()
+                .stream()
+                .anyMatch(m -> m.getId().equals(mediaId));
+
+        if (alreadyOwned) {
+            return false;
+        }
+
+        if (user.getBalance().compareTo(media.getPrice()) < 0) {
+            return false;
+        }
+
+        user.setBalance(user.getBalance().subtract(media.getPrice()));
+        user.getOwnedMedia().add(media);
+
+        userRepository.save(user);
+
+        return true;
+    }
+
+    // ===== HOME (PLAYER DTOs) =====
+    //Връща само купените ПЕСНИ
+    //като MediaHome DTO:
+    //
+    //id
+    //
+    //title
+    //
+    //youtubeVideoId
+
+    public List<MediaHome> getUserMusicForHome(User user) {
         return user.getOwnedMedia()
                 .stream()
-                .filter(m -> m.getType() == type)
-                .sorted((a, b) -> Integer.compare(b.getYear(), a.getYear()))
+                .filter(m -> m.getType() == MediaType.MUSIC)
+                .map(this::toHomeDto)
                 .toList();
     }
 
-
-    // za home controller
-    public List<MediaItem> getUserMusic(User user) {
-        return getUserMedia(user, MediaType.MUSIC);
+    //Същото като горното, но за филми
+    public List<MediaHome> getUserMoviesForHome(User user) {
+        return user.getOwnedMedia()
+                .stream()
+                .filter(m -> m.getType() == MediaType.MOVIE)
+                .map(this::toHomeDto)
+                .toList();
     }
 
-    public List<MediaItem> getUserMovies(User user) {
-        return getUserMedia(user, MediaType.MOVIE);
+    //Mapper (преобразувател).
+    private MediaHome toHomeDto(MediaItem media) {
+        return new MediaHome(
+                media.getId(),
+                media.getTitle(),
+                media.getYoutubeVideoId()
+        );
     }
 }

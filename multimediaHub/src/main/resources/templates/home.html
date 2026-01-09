@@ -1,194 +1,260 @@
+Готово! Премахнах бутона My Library от горната лента, като запазих останалите (Market, Wallet и Settings) и цялата функционалност на цветомузиката и плеъра.
+
+Ето пълния обновен код:
+
+HTML
+
 <!DOCTYPE html>
 <html lang="bg" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
-
+    <title>Home - Neon Media Player</title>
     <style>
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             color: white;
             background-size: cover;
             background-position: center;
-            transition: background-image 0.3s ease;
+            background-attachment: fixed;
+            transition: 0.5s;
+            background-color: #050505;
+            overflow-x: hidden;
         }
 
-        body.music-mode {
-            background-image: url("/images/home.jpg");
-        }
+        body.music-mode { background-image: url("/images/home.jpg"); }
+        body.movie-mode { background-image: url("/images/cinema.jpg"); }
 
-        body.movie-mode {
-            background-image: url("/images/cinema.jpg");
-        }
-
-        /* TOP BAR */
+        /* ГОРНА ЛЕНТА */
         .top-bar {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 20px;
-            background: rgba(0,0,0,0.6);
+            position: fixed;
+            top: 0; width: 100%; z-index: 1000;
+            display: flex; justify-content: space-between;
+            padding: 12px 25px; box-sizing: border-box;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0,255,255,0.2);
         }
+
+        .nav-group { display: flex; gap: 12px; }
 
         .nav-btn {
             padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
             color: white;
             border-radius: 6px;
             text-decoration: none;
-            border: none;
+            border: 1px solid rgba(255,255,255,0.2);
             cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
         }
+        .nav-btn:hover { background: rgba(0,255,255,0.2); border-color: #00f2fe; }
+        .logout-btn { color: #ff5555; border-color: rgba(255,85,85,0.3); }
 
-        .logout-btn {
-            background: rgba(255,80,80,0.4);
-        }
-
-        /* PLAYER */
-        .player-container {
-            width: 460px;
-            margin: 60px auto;
-            background: rgba(0,0,0,0.6);
-            padding: 20px;
-            border-radius: 12px;
-        }
-
-        iframe {
-            width: 100%;
-            height: 240px;
-            border-radius: 8px;
-            border: none;
-        }
-
-        .player-header {
+        /* ОСНОВНА СТРУКТУРА */
+        .main-layout {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            padding-top: 100px;
+            min-height: calc(100vh - 100px);
         }
 
-        .player-header button {
-            flex: 1;
-            padding: 8px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
+        /* СТРАНИЧНИ ВИЗУАЛИЗАТОРИ */
+        .side-visualizer {
+            width: 100px;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 5px;
+            padding-bottom: 20px;
+            overflow: hidden;
         }
+
+        .vis-bar {
+            width: 7px;
+            background: linear-gradient(to top, #00f2fe 0%, #00ff00 100%);
+            border-radius: 4px;
+            height: 5px;
+            transition: height 0.05s ease;
+            box-shadow: 0 0 8px rgba(0,255,0,0.4);
+        }
+
+        /* ПЛЕЪР */
+        .player-container {
+            width: 500px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #player { width: 100%; height: 280px; border-radius: 15px; background: #000; margin-bottom: 15px; border: 1px solid #333; }
 
         .playlist {
-            list-style: none;
-            padding: 0;
-            margin: 12px 0;
-            max-height: 180px;
-            overflow-y: auto;
+            list-style: none; padding: 0; margin: 15px 0;
+            max-height: 110px; overflow-y: auto;
+            background: rgba(255,255,255,0.03); border-radius: 10px;
         }
+        .playlist li { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        .playlist li.active { background: rgba(0,255,0,0.1); color: #00ff00; border-left: 4px solid #00ff00; }
 
-        .playlist li {
-            padding: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .controls {
-            display: flex;
-            gap: 6px;
-        }
-
+        .controls { display: flex; gap: 10px; margin-top: 15px; }
         .controls button {
-            flex: 1;
-            padding: 10px;
-            background: rgba(255,255,255,0.25);
-            border: none;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
+            flex: 1; padding: 12px; background: #1a1a1a; border: 1px solid #333;
+            color: white; border-radius: 10px; cursor: pointer; font-size: 1.2em;
         }
+        .controls button:hover { border-color: #00ff00; }
+
+        .volume-container { display: flex; align-items: center; gap: 15px; margin-top: 15px; }
+        .volume-slider { flex: 1; accent-color: #00ff00; cursor: pointer; }
+
+        .status-text { font-size: 11px; color: #555; text-align: center; margin-top: 10px; }
     </style>
 </head>
-
 <body class="music-mode">
 
-<!-- TOP BAR -->
 <div class="top-bar">
-    <div style="display: flex; gap: 10px;">
+    <div class="nav-group">
         <a th:href="@{/market}" class="nav-btn">Market</a>
         <a th:href="@{/wallet}" class="nav-btn">Wallet</a>
         <a th:href="@{/settings}" class="nav-btn">Settings</a>
     </div>
-
     <form th:action="@{/logout}" method="post">
-        <button class="nav-btn logout-btn">Logout</button>
+        <button type="submit" class="nav-btn logout-btn">Logout</button>
     </form>
 </div>
 
-<!-- PLAYER -->
-<div class="player-container">
+<div class="main-layout">
+    <div class="side-visualizer" id="vis-left"></div>
 
-    <!-- MODE BUTTONS -->
-    <div class="player-header">
-        <button onclick="switchToMusic()">Music</button>
-        <button onclick="switchToMovies()">Movies</button>
+    <div class="player-container">
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="nav-btn" style="flex:1" onclick="switchToMusic()">Music</button>
+            <button class="nav-btn" style="flex:1" onclick="switchToMovies()">Movies</button>
+        </div>
+
+        <div id="player"></div>
+
+        <ul class="playlist" id="playlist"></ul>
+
+        <div class="controls">
+            <button onclick="prev()">⏮</button>
+            <button id="playBtn" onclick="togglePlay()">▶</button>
+            <button onclick="next()">⏭</button>
+        </div>
+
+        <div class="volume-container">
+            <span>🔈</span>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50" oninput="changeVolume(this.value)">
+            <span>🔊</span>
+        </div>
+        <p class="status-text" id="statusText">Кликни върху страницата за активиране на ефектите</p>
     </div>
 
-    <!-- YOUTUBE PLAYER (ВИНАГИ ВИДИМ) -->
-    <iframe
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-            allow="autoplay; encrypted-media"
-            allowfullscreen>
-    </iframe>
-
-    <!-- PLAYLIST (МОЖЕ ДА Е ПРАЗЕН) -->
-    <ul class="playlist" id="playlist">
-        <!-- JS ще я пълни -->
-    </ul>
-
-    <!-- CONTROLS -->
-    <div class="controls">
-        <button>⏮</button>
-        <button>▶</button>
-        <button>⏸</button>
-        <button>⏭</button>
-    </div>
+    <div class="side-visualizer" id="vis-right"></div>
 </div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script th:inline="javascript">
+    const musicList = [[${musicList}]] || [];
+    const movieList = [[${movieList}]] || [];
+</script>
+
 <script>
-    const musicList = [];
-    const movieList = [];
+    let player;
+    let currentList = [];
+    let currentIndex = 0;
+    let audioContext, analyser, dataArray;
+    let isVisualizerStarted = false;
 
-    function renderList(list) {
-        const ul = document.getElementById("playlist");
-        ul.innerHTML = "";
+    function createBars() {
+        const containers = [document.getElementById('vis-left'), document.getElementById('vis-right')];
+        containers.forEach(container => {
+            for (let i = 0; i < 8; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'vis-bar';
+                container.appendChild(bar);
+            }
+        });
+    }
+    createBars();
 
-        if (list.length === 0) {
-            const li = document.createElement("li");
-            li.textContent = "Няма налично съдържание";
-            ul.appendChild(li);
-            return;
-        }
-
-        list.forEach(item => {
-            const li = document.createElement("li");
-            li.textContent = item;
-            ul.appendChild(li);
+    function onYouTubeIframeAPIReady() {
+        currentList = musicList;
+        player = new YT.Player('player', {
+            height: '280', width: '100%',
+            videoId: currentList.length > 0 ? currentList[0].youtubeVideoId : '',
+            playerVars: { 'autoplay': 0, 'controls': 1 },
+            events: {
+                'onReady': () => render(),
+                'onStateChange': (e) => {
+                    document.getElementById("playBtn").textContent = (e.data === 1) ? "⏸" : "▶";
+                    if (e.data === 0) next();
+                }
+            }
         });
     }
 
-    function switchToMusic() {
-        document.body.classList.remove("movie-mode");
-        document.body.classList.add("music-mode");
-        renderList(musicList);
+    async function initVisualizer() {
+        if (isVisualizerStarted) return;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+            analyser.fftSize = 64;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            isVisualizerStarted = true;
+            document.getElementById("statusText").textContent = "Цветомузиката е активна!";
+            draw();
+        } catch (e) {
+            document.getElementById("statusText").textContent = "Разреши микрофона за ефектите.";
+        }
     }
 
-    function switchToMovies() {
-        document.body.classList.remove("music-mode");
-        document.body.classList.add("movie-mode");
-        renderList(movieList);
+    function draw() {
+        requestAnimationFrame(draw);
+        if (!analyser) return;
+        analyser.getByteFrequencyData(dataArray);
+        const bars = document.querySelectorAll('.vis-bar');
+        for (let i = 0; i < 8; i++) {
+            let height = (dataArray[i * 2] / 255) * 380 + 10;
+            if(bars[i]) bars[i].style.height = height + 'px';
+            if(bars[i+8]) bars[i+8].style.height = height + 'px';
+        }
     }
 
-    // INIT
-    switchToMusic();
+    window.addEventListener('click', initVisualizer);
+
+    function render() {
+        const list = document.getElementById("playlist");
+        list.innerHTML = "";
+        currentList.forEach((m, i) => {
+            const li = document.createElement("li");
+            li.textContent = m.title;
+            if (i === currentIndex) li.classList.add("active");
+            li.onclick = () => { currentIndex=i; player.loadVideoById(currentList[i].youtubeVideoId); render(); };
+            list.appendChild(li);
+        });
+    }
+
+    function togglePlay() { (player.getPlayerState() === 1) ? player.pauseVideo() : player.playVideo(); }
+    function next() { if(currentList.length > 0) { currentIndex = (currentIndex + 1) % currentList.length; player.loadVideoById(currentList[currentIndex].youtubeVideoId); render(); } }
+    function prev() { if(currentList.length > 0) { currentIndex = (currentIndex - 1 + currentList.length) % currentList.length; player.loadVideoById(currentList[currentIndex].youtubeVideoId); render(); } }
+    function changeVolume(v) { if(player) player.setVolume(v); }
+    function switchToMusic() { document.body.className="music-mode"; currentList=musicList; if(currentList[0]) player.cueVideoById(currentList[0].youtubeVideoId); render(); }
+    function switchToMovies() { document.body.className="movie-mode"; currentList=movieList; if(currentList[0]) player.cueVideoById(currentList[0].youtubeVideoId); render(); }
 </script>
-
 </body>
 </html>

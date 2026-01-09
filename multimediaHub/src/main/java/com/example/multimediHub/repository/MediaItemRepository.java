@@ -30,4 +30,5 @@ public interface MediaItemRepository extends JpaRepository<MediaItem, UUID> {
             @Param("type") MediaType type,
             @Param("ownedIds") List<UUID> ownedIds
     );
+
 }

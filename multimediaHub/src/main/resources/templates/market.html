@@ -15,7 +15,6 @@
             background-position: center;
         }
 
-        /* TOP BAR */
         .top-bar {
             display: flex;
             align-items: center;
@@ -31,7 +30,6 @@
             text-decoration: none;
             border-radius: 6px;
             font-size: 14px;
-            width: fit-content;
         }
 
         .balance {
@@ -39,7 +37,6 @@
             font-weight: bold;
         }
 
-        /* MAIN */
         .market-container {
             max-width: 900px;
             margin: 40px auto;
@@ -65,7 +62,6 @@
             font-size: 15px;
         }
 
-        /* MEDIA LIST */
         .media-list {
             list-style: none;
             padding: 0;
@@ -112,7 +108,6 @@
             opacity: 0.6;
         }
 
-        /* DESCRIPTION */
         .description-tooltip {
             position: absolute;
             bottom: 100%;
@@ -140,7 +135,6 @@
 
 <body>
 
-<!-- TOP BAR -->
 <div class="top-bar">
     <a th:href="@{/home}" class="back-btn">← Back</a>
 
@@ -178,10 +172,18 @@
             <div class="media-actions">
                 <span th:text="${m.price}"></span> EUR
 
+                <!-- BUY -->
                 <form th:action="@{/market/buy/{id}(id=${m.id})}" method="post">
                     <button class="buy-btn"
                             th:disabled="${user.balance.compareTo(m.price) < 0}">
                         Buy
+                    </button>
+                </form>
+
+                <!-- GIFT -->
+                <form th:action="@{/market/present/{id}(id=${m.id})}" method="get">
+                    <button class="buy-btn" style="background:#ff9800">
+                        Gift 🎁
                     </button>
                 </form>
             </div>
@@ -210,10 +212,18 @@
             <div class="media-actions">
                 <span th:text="${m.price}"></span> EUR
 
+                <!-- BUY -->
                 <form th:action="@{/market/buy/{id}(id=${m.id})}" method="post">
                     <button class="buy-btn"
                             th:disabled="${user.balance.compareTo(m.price) < 0}">
                         Buy
+                    </button>
+                </form>
+
+                <!-- GIFT -->
+                <form th:action="@{/market/present/{id}(id=${m.id})}" method="get">
+                    <button class="buy-btn" style="background:#ff9800">
+                        Gift 🎁
                     </button>
                 </form>
             </div>

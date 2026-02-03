@@ -3,51 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Регистрация</title>
-
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-
             background: url('/images/register.jpg') no-repeat center center fixed;
             background-size: cover;
-
             display: flex;
             justify-content: center;
             align-items: center;
-
             height: 100vh;
         }
-
         .register-box {
             width: 380px;
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             padding: 30px 35px;
             border-radius: 15px;
             box-shadow: 0 0 25px rgba(0, 0, 0, 0.35);
         }
-
-        h2 {
-            margin-bottom: 25px;
-            font-weight: bold;
-            text-align: center;
-            color: white;
-        }
-
-        label {
-            color: white;
-            font-size: 14px;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
+        h2 { text-align: center; color: white; margin-bottom: 25px; }
+        label { color: white; font-size: 14px; margin-bottom: 6px; display: block; }
+        .form-group { margin-bottom: 15px; }
         input {
             width: 100%;
             padding: 10px 12px;
@@ -58,21 +36,12 @@
             font-size: 15px;
             outline: none;
         }
-
-        input.error {
-            border-color: #ff4444;
-        }
-
-        .error-message {
-            color: #ffaaaa;
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
+        input.error { border-color: #ff4444; }
+        .error-message { color: #ffaaaa; font-size: 13px; margin-top: 4px; }
         button {
             width: 100%;
             padding: 12px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.7);
             color: white;
             border: none;
             border-radius: 6px;
@@ -81,103 +50,68 @@
             margin-top: 10px;
             transition: 0.2s ease-in-out;
         }
-
-        button:hover {
-            background: rgba(0, 0, 0, 0.9);
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .login-link a {
-            text-decoration: none;
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .exists-error {
-            color: #ff7777;
-            text-align: center;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
+        button:hover { background: rgba(0,0,0,0.9); }
+        .login-link { text-align: center; margin-top: 15px; }
+        .login-link a { color: #ffffff; font-weight: bold; text-decoration: none; }
+        .login-link a:hover { text-decoration: underline; }
+        .exists-error { color: #ff7777; text-align: center; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
-
 <body>
-
 <div class="register-box">
-
     <h2>Създай акаунт</h2>
 
-    <!-- userExists flag -->
     <div th:if="${userExists}" class="exists-error">
         Потребител с това име или имейл вече съществува!
     </div>
 
     <form th:action="@{/register}" method="post" th:object="${userRegisterBindingModel}">
-
-        <!-- USERNAME -->
         <div class="form-group">
             <label for="username">Потребителско име</label>
-            <input type="text" id="username" th:field="*{username}"
-                   th:classappend="${#fields.hasErrors('username')} ? 'error'">
+            <input type="text" id="username" th:field="*{username}" th:classappend="${#fields.hasErrors('username')} ? 'error'">
             <div class="error-message" th:errors="*{username}"></div>
         </div>
 
-        <!-- EMAIL -->
         <div class="form-group">
             <label for="email">Имейл</label>
-            <input type="email" id="email" th:field="*{email}"
-                   th:classappend="${#fields.hasErrors('email')} ? 'error'">
+            <input type="email" id="email" th:field="*{email}" th:classappend="${#fields.hasErrors('email')} ? 'error'">
             <div class="error-message" th:errors="*{email}"></div>
         </div>
 
-        <!-- PASSWORD -->
         <div class="form-group">
             <label for="password">Парола</label>
-            <input type="password" id="password" th:field="*{password}"
-                   th:classappend="${#fields.hasErrors('password')} ? 'error'">
+            <input type="password" id="password" th:field="*{password}" th:classappend="${#fields.hasErrors('password')} ? 'error'">
             <div class="error-message" th:errors="*{password}"></div>
         </div>
 
-        <!-- CONFIRM PASSWORD -->
         <div class="form-group">
             <label for="confirmPassword">Повтори паролата</label>
-            <input type="password" id="confirmPassword" th:field="*{confirmPassword}"
-                   th:classappend="${#fields.hasErrors('confirmPassword')} ? 'error'">
+            <input type="password" id="confirmPassword" th:field="*{confirmPassword}" th:classappend="${#fields.hasErrors('confirmPassword')} ? 'error'">
             <div class="error-message" th:errors="*{confirmPassword}"></div>
         </div>
 
-        <!-- BALANCE -->
         <div class="form-group">
             <label for="walletBalance">Начален баланс</label>
-            <input type="number" id="walletBalance" th:field="*{walletBalance}">
+            <input type="text" id="walletBalance" th:field="*{walletBalance}" th:classappend="${#fields.hasErrors('walletBalance')} ? 'error'">
+            <div class="error-message" th:errors="*{walletBalance}"></div>
         </div>
 
-        <!-- CARD NUMBER -->
         <div class="form-group">
             <label for="cardNumber">Номер на карта</label>
-            <input type="text" id="cardNumber" th:field="*{cardNumber}">
+            <input type="text" id="cardNumber" th:field="*{cardNumber}" th:classappend="${#fields.hasErrors('cardNumber')} ? 'error'">
+            <div class="error-message" th:errors="*{cardNumber}"></div>
         </div>
 
-        <!-- EXPIRY -->
         <div class="form-group">
             <label for="cardExpiry">Валидност на карта (MM/YY)</label>
-            <input type="text" id="cardExpiry" th:field="*{cardExpiry}">
+            <input type="text" id="cardExpiry" th:field="*{cardExpiry}" th:classappend="${#fields.hasErrors('cardExpiry')} ? 'error'">
+            <div class="error-message" th:errors="*{cardExpiry}"></div>
         </div>
 
-        <!-- CVV -->
         <div class="form-group">
             <label for="cvv">CVV</label>
-            <input type="password" id="cvv" th:field="*{cvv}">
+            <input type="password" id="cvv" th:field="*{cvv}" th:classappend="${#fields.hasErrors('cvv')} ? 'error'">
+            <div class="error-message" th:errors="*{cvv}"></div>
         </div>
 
         <button type="submit">Регистрация</button>
@@ -186,8 +120,6 @@
     <div class="login-link">
         <p>Вече имаш профил? <a th:href="@{/login}">Вход</a></p>
     </div>
-
 </div>
-
 </body>
 </html>

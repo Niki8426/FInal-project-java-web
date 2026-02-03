@@ -1,15 +1,11 @@
-Готово! Премахнах бутона My Library от горната лента, като запазих останалите (Market, Wallet и Settings) и цялата функционалност на цветомузиката и плеъра.
-
-Ето пълния обновен код:
-
-HTML
-
 <!DOCTYPE html>
 <html lang="bg" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Home - Neon Media Player</title>
     <style>
+        /* всичко твое е непокътнато */
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -26,7 +22,6 @@ HTML
         body.music-mode { background-image: url("/images/home.jpg"); }
         body.movie-mode { background-image: url("/images/cinema.jpg"); }
 
-        /* ГОРНА ЛЕНТА */
         .top-bar {
             position: fixed;
             top: 0; width: 100%; z-index: 1000;
@@ -52,7 +47,6 @@ HTML
         .nav-btn:hover { background: rgba(0,255,255,0.2); border-color: #00f2fe; }
         .logout-btn { color: #ff5555; border-color: rgba(255,85,85,0.3); }
 
-        /* ОСНОВНА СТРУКТУРА */
         .main-layout {
             display: flex;
             justify-content: center;
@@ -62,7 +56,6 @@ HTML
             min-height: calc(100vh - 100px);
         }
 
-        /* СТРАНИЧНИ ВИЗУАЛИЗАТОРИ */
         .side-visualizer {
             width: 100px;
             height: 450px;
@@ -87,7 +80,6 @@ HTML
             box-shadow: 0 0 8px rgba(0,255,0,0.4);
         }
 
-        /* ПЛЕЪР */
         .player-container {
             width: 500px;
             background: rgba(0, 0, 0, 0.85);
@@ -118,8 +110,56 @@ HTML
         .volume-slider { flex: 1; accent-color: #00ff00; cursor: pointer; }
 
         .status-text { font-size: 11px; color: #555; text-align: center; margin-top: 10px; }
+
+        /* 📨 MESSAGE BAR */
+        .messages-sidebar {
+            position: fixed;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            width: 300px;
+            max-height: 420px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0,255,255,0.25);
+            border-radius: 20px;
+            padding: 15px;
+            overflow-y: auto;
+            z-index: 900;
+        }
+
+        .messages-sidebar h3 {
+            text-align: center;
+            color: #00f2fe;
+            margin-top: 0;
+        }
+
+        .message-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .message-item small {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .delete-btn {
+            margin-top: 6px;
+            background: transparent;
+            border: none;
+            color: #ff6666;
+            cursor: pointer;
+            font-size: 13px;
+        }
     </style>
 </head>
+
 <body class="music-mode">
 
 <div class="top-bar">
@@ -161,6 +201,24 @@ HTML
     </div>
 
     <div class="side-visualizer" id="vis-right"></div>
+</div>
+
+<!-- 📨 MESSAGE BAR -->
+<div class="messages-sidebar" th:if="${messages != null}">
+    <h3>📨 Messages</h3>
+
+    <div th:if="${#lists.isEmpty(messages)}">
+        <p style="text-align:center;font-size:12px;color:#aaa;">No messages</p>
+    </div>
+
+    <div th:each="msg : ${messages}" class="message-item">
+        <p th:text="${msg.content}"></p>
+        <small th:text="${#temporals.format(msg.createdAt,'dd-MM-yyyy HH:mm')}"></small>
+
+        <form th:action="@{/messages/delete/{id}(id=${msg.id})}" method="post">
+            <button type="submit">Delete</button>
+        </form>
+    </div>
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>

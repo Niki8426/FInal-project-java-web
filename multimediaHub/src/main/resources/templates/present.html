@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Make a Gift</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      background: url("/images/present.jpg") center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .gift-box {
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 14px;
+      width: 420px;
+      text-align: center;
+    }
+
+    .gift-box h2 {
+      margin-bottom: 12px;
+    }
+
+    .gift-box p {
+      opacity: 0.85;
+      margin-bottom: 20px;
+    }
+
+    .gift-box label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .gift-box input,
+    .gift-box textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+    }
+
+    .gift-box textarea {
+      resize: none;
+      height: 80px;
+    }
+
+    .gift-box button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #4caf50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .back {
+      display: block;
+      margin-top: 15px;
+      color: #ccc;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #ff6b6b;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="gift-box">
+
+  <h2 th:text="'🎁 Gift: ' + ${media.title}">🎁 Gift</h2>
+
+  <!-- ГРЕШКА ОТ BACKEND -->
+  <p th:if="${giftError}"
+     th:text="${giftError}"
+     class="error">
+  </p>
+
+  <p th:text="${media.description}">
+    Media description
+  </p>
+
+  <form th:action="@{/market/present/{id}(id=${media.id})}"
+        th:object="${giftForm}"
+        method="post">
+
+    <label for="receiverUsername">Send to user (username)</label>
+    <input type="text"
+           id="receiverUsername"
+           th:field="*{receiverUsername}"
+           placeholder="Username"
+           required />
+
+    <label for="message">Message</label>
+    <textarea id="message"
+              th:field="*{message}"
+              placeholder="Write something nice..."
+              required></textarea>
+
+    <button type="submit">Send Gift</button>
+  </form>
+
+  <a th:href="@{/market}" class="back">← Back to market</a>
+</div>
+
+</body>
+</html>

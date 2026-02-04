@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="bg"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Wallet</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+
+    <style>
+        body {
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .wallet-container {
+            max-width: 420px;
+            margin: 80px auto;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.75);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .wallet-container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .wallet-container label {
+            display: block;
+            margin-top: 15px;
+        }
+
+        .wallet-container input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .wallet-container button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 10px;
+            background: #2ecc71;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            padding: 8px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .back-btn:hover {
+            background: #2980b9;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body th:style="'background-image:url(/images/' + ${backgroundImage} + '.jpg)'">
+
+<div class="wallet-container">
+    <h2>Зареждане на средства</h2>
+
+    <form th:action="@{/wallet}" th:object="${walletDto}" method="post">
+
+        <label>Сума</label>
+        <input type="number" step="0.01" th:field="*{amount}"/>
+        <p class="error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></p>
+
+        <label>Номер на карта</label>
+        <input type="text" th:field="*{cardNumber}"/>
+        <p class="error" th:if="${#fields.hasErrors('cardNumber')}" th:errors="*{cardNumber}"></p>
+
+        <label>Валидност (MM/YY)</label>
+        <input type="text" th:field="*{cardExpiry}"/>
+        <p class="error" th:if="${#fields.hasErrors('cardExpiry')}" th:errors="*{cardExpiry}"></p>
+
+        <label>CVV</label>
+        <input type="password" th:field="*{cvv}"/>
+        <p class="error" th:if="${#fields.hasErrors('cvv')}" th:errors="*{cvv}"></p>
+
+        <button type="submit">Зареди</button>
+    </form>
+
+    <!-- BACK BUTTON -->
+    <a th:href="@{/home}" class="back-btn">⬅ Back</a>
+
+</div>
+
+</body>
+</html>

@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<html lang="bg" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Home - Neon Media Player</title>
     <style>
-        /* всичко твое е непокътнато */
-
         body {
             margin: 0;
             min-height: 100vh;
@@ -53,7 +51,7 @@
             align-items: center;
             gap: 30px;
             padding-top: 100px;
-            min-height: calc(100vh - 100px);
+            min-height: 80vh;
         }
 
         .side-visualizer {
@@ -77,7 +75,6 @@
             border-radius: 4px;
             height: 5px;
             transition: height 0.05s ease;
-            box-shadow: 0 0 8px rgba(0,255,0,0.4);
         }
 
         .player-container {
@@ -104,58 +101,66 @@
             flex: 1; padding: 12px; background: #1a1a1a; border: 1px solid #333;
             color: white; border-radius: 10px; cursor: pointer; font-size: 1.2em;
         }
-        .controls button:hover { border-color: #00ff00; }
 
-        .volume-container { display: flex; align-items: center; gap: 15px; margin-top: 15px; }
-        .volume-slider { flex: 1; accent-color: #00ff00; cursor: pointer; }
-
-        .status-text { font-size: 11px; color: #555; text-align: center; margin-top: 10px; }
-
-        /* 📨 MESSAGE BAR */
-        .messages-sidebar {
+        /* 📨 ДЕСЕН ПАНЕЛ (SIDEBAR) */
+        .right-sidebar {
             position: fixed;
-            top: 50%;
-            right: 30px;
-            transform: translateY(-50%);
-            width: 300px;
-            max-height: 420px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0,255,255,0.25);
+            top: 80px; /* По-малко дръпнато надолу */
+            right: 20px;
+            width: 300px; /* Малко по-широк за четаемост */
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0,255,255,0.2);
             border-radius: 20px;
             padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Гифт съобщения - разтегнати за четаемост */
+        .gift-box {
+            height: 250px;
+        }
+
+        /* Стена - разтегната надолу */
+        .wall-box {
+            height: 480px;
+        }
+
+        .scroll-area {
+            flex-grow: 1;
             overflow-y: auto;
-            z-index: 900;
-        }
-
-        .messages-sidebar h3 {
-            text-align: center;
-            color: #00f2fe;
-            margin-top: 0;
-        }
-
-        .message-item {
-            background: rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 10px;
             margin-bottom: 10px;
-            font-size: 13px;
+            padding-right: 5px;
         }
 
-        .message-item small {
-            display: block;
-            font-size: 11px;
-            color: #aaa;
-            margin-top: 5px;
+        /* За скриване на скролбара, но запазване на функционалността (по избор) */
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.3); border-radius: 10px; }
+
+        .wall-msg-item {
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid #00ff00;
+            word-wrap: break-word;
         }
 
-        .delete-btn {
-            margin-top: 6px;
-            background: transparent;
-            border: none;
-            color: #ff6666;
-            cursor: pointer;
-            font-size: 13px;
+        .admin-box {
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            border: 2px dashed #ff0000;
+            border-radius: 15px;
         }
     </style>
 </head>
@@ -177,13 +182,17 @@
     <div class="side-visualizer" id="vis-left"></div>
 
     <div class="player-container">
+        <div sec:authorize="hasRole('ADMIN')" class="admin-box">
+            <h4 style="color: #ff4444; margin: 0 0 5px 0; font-size: 14px;">Админ Панел</h4>
+            <a th:href="@{/admin/add-media}" class="nav-btn" style="background: #ff0000; border: none; font-size: 12px;">+ Добави Медия</a>
+        </div>
+
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <button class="nav-btn" style="flex:1" onclick="switchToMusic()">Music</button>
             <button class="nav-btn" style="flex:1" onclick="switchToMovies()">Movies</button>
         </div>
 
         <div id="player"></div>
-
         <ul class="playlist" id="playlist"></ul>
 
         <div class="controls">
@@ -192,31 +201,41 @@
             <button onclick="next()">⏭</button>
         </div>
 
-        <div class="volume-container">
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
             <span>🔈</span>
-            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50" oninput="changeVolume(this.value)">
+            <input type="range" style="flex:1; accent-color: #00ff00;" min="0" max="100" value="50" oninput="if(player) player.setVolume(this.value)">
             <span>🔊</span>
         </div>
-        <p class="status-text" id="statusText">Кликни върху страницата за активиране на ефектите</p>
+        <p style="font-size: 10px; color: #555; text-align: center; margin-top: 10px;" id="statusText">Кликни за ефекти</p>
     </div>
 
     <div class="side-visualizer" id="vis-right"></div>
 </div>
 
-<!-- 📨 MESSAGE BAR -->
-<div class="messages-sidebar" th:if="${messages != null}">
-    <h3>📨 Messages</h3>
-
-    <div th:if="${#lists.isEmpty(messages)}">
-        <p style="text-align:center;font-size:12px;color:#aaa;">No messages</p>
+<div class="right-sidebar">
+    <div class="glass-panel gift-box">
+        <h4 style="color: #00f2fe; margin-top: 0; text-align: center; font-size: 14px;">📨 Messages</h4>
+        <div class="scroll-area" id="giftScroll">
+            <div th:each="msg : ${messages}" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border-left: 2px solid #00f2fe;">
+                <span th:text="${msg.content}"></span>
+                <form th:action="@{/messages/delete/{id}(id=${msg.id})}" method="post" style="display:inline; float:right;">
+                    <button type="submit" style="color: red; background: none; border: none; cursor: pointer; font-weight: bold;">×</button>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <div th:each="msg : ${messages}" class="message-item">
-        <p th:text="${msg.content}"></p>
-        <small th:text="${#temporals.format(msg.createdAt,'dd-MM-yyyy HH:mm')}"></small>
-
-        <form th:action="@{/messages/delete/{id}(id=${msg.id})}" method="post">
-            <button type="submit">Delete</button>
+    <div class="glass-panel wall-box">
+        <h4 style="color: #00ff00; margin-top: 0; text-align: center; font-size: 14px;">🌐 Public Wall</h4>
+        <div class="scroll-area" id="wallScroll">
+            <div th:each="wm : ${wallMessages}" class="wall-msg-item">
+                <strong th:text="${wm.author.username}" style="color: #00f2fe;"></strong>:
+                <span th:text="${wm.content}"></span>
+            </div>
+        </div>
+        <form th:action="@{/home/wall/post}" method="post" style="display: flex; gap: 5px;">
+            <input type="text" name="content" required placeholder="Напиши нещо..." style="flex:1; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 8px; padding: 10px; font-size: 13px; outline: none;">
+            <button type="submit" class="nav-btn" style="padding: 5px 12px;">🚀</button>
         </form>
     </div>
 </div>
@@ -229,71 +248,35 @@
 </script>
 
 <script>
-    let player;
-    let currentList = [];
-    let currentIndex = 0;
-    let audioContext, analyser, dataArray;
-    let isVisualizerStarted = false;
-
-    function createBars() {
-        const containers = [document.getElementById('vis-left'), document.getElementById('vis-right')];
-        containers.forEach(container => {
-            for (let i = 0; i < 8; i++) {
-                const bar = document.createElement('div');
-                bar.className = 'vis-bar';
-                container.appendChild(bar);
-            }
-        });
+    // Скрипт за автоматично скролване до дъното на съобщенията
+    function autoScroll() {
+        const giftScroll = document.getElementById('giftScroll');
+        const wallScroll = document.getElementById('wallScroll');
+        if(giftScroll) giftScroll.scrollTop = giftScroll.scrollHeight;
+        if(wallScroll) wallScroll.scrollTop = wallScroll.scrollHeight;
     }
-    createBars();
+
+    // Изпълняваме при зареждане
+    window.addEventListener('load', autoScroll);
+
+    let player, currentList = [], currentIndex = 0;
+    let audioContext, analyser, dataArray, isVisOn = false;
 
     function onYouTubeIframeAPIReady() {
         currentList = musicList;
-        player = new YT.Player('player', {
-            height: '280', width: '100%',
-            videoId: currentList.length > 0 ? currentList[0].youtubeVideoId : '',
-            playerVars: { 'autoplay': 0, 'controls': 1 },
-            events: {
-                'onReady': () => render(),
-                'onStateChange': (e) => {
-                    document.getElementById("playBtn").textContent = (e.data === 1) ? "⏸" : "▶";
-                    if (e.data === 0) next();
-                }
-            }
-        });
-    }
-
-    async function initVisualizer() {
-        if (isVisualizerStarted) return;
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            const source = audioContext.createMediaStreamSource(stream);
-            source.connect(analyser);
-            analyser.fftSize = 64;
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-            isVisualizerStarted = true;
-            document.getElementById("statusText").textContent = "Цветомузиката е активна!";
-            draw();
-        } catch (e) {
-            document.getElementById("statusText").textContent = "Разреши микрофона за ефектите.";
+        if (currentList.length > 0) {
+            player = new YT.Player('player', {
+                height: '280', width: '100%',
+                videoId: currentList[0].youtubeVideoId,
+                events: { 'onReady': render, 'onStateChange': onPlayerStateChange }
+            });
         }
     }
 
-    function draw() {
-        requestAnimationFrame(draw);
-        if (!analyser) return;
-        analyser.getByteFrequencyData(dataArray);
-        const bars = document.querySelectorAll('.vis-bar');
-        for (let i = 0; i < 8; i++) {
-            let height = (dataArray[i * 2] / 255) * 380 + 10;
-            if(bars[i]) bars[i].style.height = height + 'px';
-            if(bars[i+8]) bars[i+8].style.height = height + 'px';
-        }
+    function onPlayerStateChange(e) {
+        document.getElementById("playBtn").textContent = (e.data === 1) ? "⏸" : "▶";
+        if (e.data === 0) next();
     }
-
-    window.addEventListener('click', initVisualizer);
 
     function render() {
         const list = document.getElementById("playlist");
@@ -302,17 +285,59 @@
             const li = document.createElement("li");
             li.textContent = m.title;
             if (i === currentIndex) li.classList.add("active");
-            li.onclick = () => { currentIndex=i; player.loadVideoById(currentList[i].youtubeVideoId); render(); };
+            li.onclick = () => { currentIndex = i; player.loadVideoById(currentList[i].youtubeVideoId); render(); };
             list.appendChild(li);
         });
     }
 
-    function togglePlay() { (player.getPlayerState() === 1) ? player.pauseVideo() : player.playVideo(); }
+    function togglePlay() { if(player) (player.getPlayerState() === 1) ? player.pauseVideo() : player.playVideo(); }
     function next() { if(currentList.length > 0) { currentIndex = (currentIndex + 1) % currentList.length; player.loadVideoById(currentList[currentIndex].youtubeVideoId); render(); } }
     function prev() { if(currentList.length > 0) { currentIndex = (currentIndex - 1 + currentList.length) % currentList.length; player.loadVideoById(currentList[currentIndex].youtubeVideoId); render(); } }
-    function changeVolume(v) { if(player) player.setVolume(v); }
-    function switchToMusic() { document.body.className="music-mode"; currentList=musicList; if(currentList[0]) player.cueVideoById(currentList[0].youtubeVideoId); render(); }
-    function switchToMovies() { document.body.className="movie-mode"; currentList=movieList; if(currentList[0]) player.cueVideoById(currentList[0].youtubeVideoId); render(); }
+
+    function switchToMusic() {
+        document.body.className="music-mode";
+        currentList = musicList;
+        currentIndex = 0;
+        if(currentList.length > 0) { player.loadVideoById(currentList[0].youtubeVideoId); render(); }
+    }
+
+    function switchToMovies() {
+        document.body.className="movie-mode";
+        currentList = movieList;
+        currentIndex = 0;
+        if(currentList.length > 0) { player.loadVideoById(currentList[0].youtubeVideoId); render(); }
+    }
+
+    function createBars() {
+        const containers = [document.getElementById('vis-left'), document.getElementById('vis-right')];
+        containers.forEach(c => { for(let i=0; i<8; i++) { const b = document.createElement('div'); b.className='vis-bar'; c.appendChild(b); }});
+    }
+    createBars();
+
+    async function initVis() {
+        if(isVisOn) return;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            audioContext.createMediaStreamSource(stream).connect(analyser);
+            analyser.fftSize = 64;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            isVisOn = true;
+            draw();
+        } catch(e) {}
+    }
+    function draw() {
+        requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
+        const bars = document.querySelectorAll('.vis-bar');
+        for(let i=0; i<8; i++) {
+            let h = (dataArray[i*2]/255) * 400 + 5;
+            if(bars[i]) bars[i].style.height = h + 'px';
+            if(bars[i+8]) bars[i+8].style.height = h + 'px';
+        }
+    }
+    window.addEventListener('click', initVis);
 </script>
 </body>
 </html>

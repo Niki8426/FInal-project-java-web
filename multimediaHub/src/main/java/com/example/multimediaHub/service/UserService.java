@@ -114,7 +114,7 @@ public class UserService implements UserDetailsService {
         user.setBalance(newBalance);
 
         // 4. Записваме промените
-        // Hibernate автоматично ще направи "UPDATE", защото обекта е изтеглен от базата в същата транзакция
+
         userRepository.save(user);
     }
 }

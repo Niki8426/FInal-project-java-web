@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -27,7 +28,19 @@ public class UserData implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> "ROLE_" + role.toUpperCase());
+        String finalRole;
+
+        // 1. Проверяваме дали ролята вече започва с "ROLE_"
+        if (this.role.startsWith("ROLE_")) {
+            // да - просто я правим с големи букви
+            finalRole = this.role.toUpperCase();
+        } else {
+            //  не - добавяме префикса и я правим с големи букви
+            finalRole = "ROLE_" + this.role.toUpperCase();
+        }
+
+        // 2. Превръщаме стринга в списък, който Spring Security разбира
+        return AuthorityUtils.createAuthorityList(finalRole);
     }
 
     @Override

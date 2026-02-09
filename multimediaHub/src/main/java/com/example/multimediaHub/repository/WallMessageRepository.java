@@ -10,4 +10,6 @@ public interface WallMessageRepository extends JpaRepository<WallMessage, UUID> 
 
     // Използваме Ascending (възходящ ред), за да може новите да са в края на списъка
     List<WallMessage> findAllByOrderByCreatedAtAsc();
+
+    List<WallMessage> findAllByOrderByCreatedAtDesc();
 }

@@ -8,6 +8,7 @@ import com.example.multimediaHub.web.dto.Register;
 import com.example.multimediaHub.web.dto.UserSettingsDto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,7 +35,14 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-        return new UserData(user.getId(), user.getUsername(), user.getPassword(), user.getRole());
+
+        // Връщаме ТВОЯ UserData, а не стандартния на Spring
+        return new UserData(
+                user.getId(),
+                user.getUsername(),
+                user.getPassword(),
+                user.getRole()
+        );
     }
 
     @Transactional

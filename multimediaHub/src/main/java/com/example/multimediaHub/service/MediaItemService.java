@@ -8,6 +8,7 @@ import com.example.multimediaHub.web.dto.MediaHome;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -132,5 +133,22 @@ public class MediaItemService {
 
     public MediaItem getById(UUID id) {
         return mediaItemRepository.findById(id).orElseThrow();
+    }
+
+    public void addMedia(String title, String videoId, MediaType type,
+                         BigDecimal price, Integer year, String genre,
+                         String imageUrl, String description) {
+        MediaItem item = new MediaItem();
+        item.setTitle(title);
+        item.setYoutubeVideoId(videoId);
+        item.setType(type);
+        item.setPrice(price);
+        item.setYear(year);
+        item.setGenre(genre);
+        item.setImageUrl(imageUrl);
+        item.setDescription(description);
+        item.setCurrent(false); // Задаваме го по подразбиране
+
+        mediaItemRepository.save(item);
     }
 }

@@ -75,16 +75,29 @@ public class HomeController {
         if (content != null && !content.trim().isEmpty()) {
             User author = userService.findUserById(userData.getUserId());
 
+            // 1. Създаваме и записваме новото съобщение
             WallMessage message = new WallMessage();
             message.setAuthor(author);
             message.setContent(content);
-
-            // ГАРАНЦИЯ: Попълваме времето на създаване, ако не се прави автоматично в модела
             message.setCreatedAt(LocalDateTime.now());
-
             wallMessageRepository.save(message);
 
             log.info("User {} posted on the wall.", author.getUsername());
+
+            // 2. АВТОМАТИЧНО ПОЧИСТВАНЕ:
+            // Вземаме всички съобщения, подредени по дата (от най-новите към най-старите)
+            List<WallMessage> allMessages = wallMessageRepository.findAllByOrderByCreatedAtDesc();
+
+            // Ако общият брой е над 100
+            if (allMessages.size() > 100) {
+                // Вземаме всички съобщения след стотното
+                List<WallMessage> messagesToDelete = allMessages.subList(100, allMessages.size());
+
+                // Изтриваме ги от базата данни
+                wallMessageRepository.deleteAll(messagesToDelete);
+
+                log.info("Auto-cleanup: Deleted {} old wall messages.", messagesToDelete.size());
+            }
         }
 
         return "redirect:/home";

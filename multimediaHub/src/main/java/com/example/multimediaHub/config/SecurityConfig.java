@@ -14,27 +14,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
-                .csrf(csrf -> csrf.disable()) // за учебен проект
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/login",
-                                "/register",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**"
-                        ).permitAll()
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
 
+                        // 1. Поправка за /home: Добавяме и чистия път "/home"
+                        .requestMatchers("/home", "/home/**").hasAnyRole("USER", "ADMIN")
+
+                        // 2. Достъп за админи
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/home/**").hasAnyRole("USER", "ADMIN")
 
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/home", true)
+                        .defaultSuccessUrl("/home", true) // Пренасочва точно тук
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

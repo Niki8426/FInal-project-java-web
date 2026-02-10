@@ -1,252 +1,192 @@
 <!DOCTYPE html>
-<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Market</title>
-
+    <title>Multimedia Market</title>
     <style>
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            color: white;
-            min-height: 100vh;
-            background-image: url("/images/market.jpg");
+            background: url('/images/market.jpg') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-        }
-
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 24px;
-            background: rgba(0,0,0,0.6);
-        }
-
-        .back-btn {
-            padding: 6px 12px;
-            background: rgba(255,255,255,0.2);
             color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 14px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
         }
 
-        .balance {
-            font-size: 20px;
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        /* Стил за бутона BACK */
+        .back-nav {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 8px 16px;
+            border-radius: 6px;
             font-weight: bold;
+            background: rgba(0, 255, 0, 0.1);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-back:hover {
+            background: #00ff00;
+            color: black;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
         }
 
         .market-container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: rgba(0,0,0,0.65);
-            padding: 24px;
-            border-radius: 12px;
-        }
-
-        .switch-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .switch-buttons button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            font-size: 15px;
-        }
-
-        .media-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .media-item {
-            position: relative;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 12px;
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .media-title {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .media-meta {
-            font-size: 13px;
-            opacity: 0.85;
-        }
-
-        .media-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .buy-btn {
-            padding: 6px 14px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            background: #4caf50;
-            color: white;
-        }
-
-        .buy-btn:disabled {
-            background: gray;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .description-tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            width: 360px;
-            padding: 10px;
-            background: rgba(0,0,0,0.9);
-            border-radius: 8px;
-            font-size: 13px;
-            display: none;
-            z-index: 10;
-        }
-
-        .media-item:hover .description-tooltip {
-            display: block;
-        }
-
-        .empty {
-            text-align: center;
             padding: 20px;
-            opacity: 0.7;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 15px;
+            margin-top: 60px; /* Малко повече разстояние заради бутона горе */
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        .balance-box {
+            text-align: right;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            color: #00ff00;
+            border-bottom: 2px solid rgba(0, 255, 0, 0.3);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .media-card {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .media-card:hover {
+            border-color: #00ff00;
+            transform: translateY(-5px);
+            background: rgba(40, 40, 40, 0.9);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .media-card img { width: 100%; border-radius: 8px; height: 280px; object-fit: cover; margin-bottom: 15px; }
+
+        .media-info h3 { margin: 10px 0 5px 0; font-size: 1.1em; height: 2.4em; overflow: hidden; color: #eee; }
+
+        .price-tag { display: block; font-weight: bold; color: #ffcc00; font-size: 1.2em; margin-bottom: 15px; }
+
+        .owned-badge {
+            display: inline-block;
+            color: #00ff00;
+            background: rgba(0, 255, 0, 0.15);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0, 255, 0, 0.2);
+        }
+
+        .button-group { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+
+        .btn-buy {
+            background: #00ff00; color: black; border: none; padding: 10px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;
+            transition: background 0.2s;
+        }
+        .btn-buy:hover { background: #05cc05; }
+
+        .btn-gift {
+            background: transparent; color: #ff00ff; border: 1px solid #ff00ff;
+            padding: 9px; border-radius: 6px; cursor: pointer; text-decoration: none;
+            font-weight: bold; transition: all 0.2s;
+        }
+        .btn-gift:hover { background: #ff00ff; color: white; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
     </style>
 </head>
-
 <body>
 
-<div class="top-bar">
-    <a th:href="@{/home}" class="back-btn">← Back</a>
-
-    <div class="balance">
-        Balance: <span th:text="${user.balance}">0</span> EUR
-    </div>
-
-    <div></div>
-</div>
+<nav class="back-nav">
+    <a th:href="@{/home}" class="btn-back">⬅ Back to Home</a>
+</nav>
 
 <div class="market-container">
+    <h1 style="text-align: center; color: #00ff00; text-shadow: 0 0 15px rgba(0,255,0,0.3);">🌌 Multimedia Market</h1>
 
-    <div class="switch-buttons">
-        <button onclick="showMusic()">Music</button>
-        <button onclick="showMovies()">Movies</button>
+    <div class="balance-box">
+        <span style="color: #ccc;">User: </span>
+        <strong th:text="${user.username}" style="color: white;">User</strong> |
+        <span>Balance: </span>
+        <span style="color: #00ff00; font-weight: bold;" th:text="${user.balance} + ' USD'">0.00 USD</span>
     </div>
 
-    <!-- MUSIC -->
-    <ul class="media-list" id="musicList">
-        <li th:if="${#lists.isEmpty(musicItems)}" class="empty">
-            Няма налична музика
-        </li>
-
-        <li class="media-item" th:each="m : ${musicItems}">
-            <div>
-                <div class="media-title" th:text="${m.title}"></div>
-                <div class="media-meta" th:if="${m.genre != null}">
-                    Genre: <span th:text="${m.genre}"></span>
+    <h2 class="section-title">🎵 Music Discoveries</h2>
+    <div class="media-grid">
+        <div th:each="item : ${musicItems}" class="media-card">
+            <img th:src="${item.imageUrl}" th:alt="${item.title}">
+            <div class="media-info">
+                <h3 th:text="${item.title}">Song Title</h3>
+                <div th:if="${ownedIds.contains(item.id)}">
+                    <span class="owned-badge">In Library ✅</span>
                 </div>
-                <div class="media-meta">
-                    Year: <span th:text="${m.year}"></span>
-                </div>
-            </div>
-
-            <div class="media-actions">
-                <span th:text="${m.price}"></span> EUR
-
-                <!-- BUY -->
-                <form th:action="@{/market/buy/{id}(id=${m.id})}" method="post">
-                    <button class="buy-btn"
-                            th:disabled="${user.balance.compareTo(m.price) < 0}">
-                        Buy
-                    </button>
-                </form>
-
-                <!-- GIFT -->
-                <form th:action="@{/market/present/{id}(id=${m.id})}" method="get">
-                    <button class="buy-btn" style="background:#ff9800">
-                        Gift 🎁
-                    </button>
-                </form>
-            </div>
-
-            <div class="description-tooltip" th:text="${m.description}"></div>
-        </li>
-    </ul>
-
-    <!-- MOVIES -->
-    <ul class="media-list" id="movieList" style="display:none">
-        <li th:if="${#lists.isEmpty(movieItems)}" class="empty">
-            Няма налични филми
-        </li>
-
-        <li class="media-item" th:each="m : ${movieItems}">
-            <div>
-                <div class="media-title" th:text="${m.title}"></div>
-                <div class="media-meta" th:if="${m.genre != null}">
-                    Genre: <span th:text="${m.genre}"></span>
-                </div>
-                <div class="media-meta">
-                    Year: <span th:text="${m.year}"></span>
+                <span class="price-tag" th:text="${item.price} + ' USD'">9.99 USD</span>
+                <div class="button-group">
+                    <form th:unless="${ownedIds.contains(item.id)}" th:action="@{/market/buy/{id}(id=${item.id})}" method="post">
+                        <button type="submit" class="btn-buy">🛒 Buy for Me</button>
+                    </form>
+                    <a th:href="@{/market/gift/{id}(id=${item.id})}" class="btn-gift">🎁 Send as Gift</a>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="media-actions">
-                <span th:text="${m.price}"></span> EUR
-
-                <!-- BUY -->
-                <form th:action="@{/market/buy/{id}(id=${m.id})}" method="post">
-                    <button class="buy-btn"
-                            th:disabled="${user.balance.compareTo(m.price) < 0}">
-                        Buy
-                    </button>
-                </form>
-
-                <!-- GIFT -->
-                <form th:action="@{/market/present/{id}(id=${m.id})}" method="get">
-                    <button class="buy-btn" style="background:#ff9800">
-                        Gift 🎁
-                    </button>
-                </form>
+    <h2 class="section-title">🎬 Featured Movies</h2>
+    <div class="media-grid">
+        <div th:each="item : ${movieItems}" class="media-card">
+            <img th:src="${item.imageUrl}" th:alt="${item.title}">
+            <div class="media-info">
+                <h3 th:text="${item.title}">Movie Title</h3>
+                <div th:if="${ownedIds.contains(item.id)}">
+                    <span class="owned-badge">In Library ✅</span>
+                </div>
+                <span class="price-tag" th:text="${item.price} + ' USD'">14.99 USD</span>
+                <div class="button-group">
+                    <form th:unless="${ownedIds.contains(item.id)}" th:action="@{/market/buy/{id}(id=${item.id})}" method="post">
+                        <button type="submit" class="btn-buy">🛒 Buy for Me</button>
+                    </form>
+                    <a th:href="@{/market/gift/{id}(id=${item.id})}" class="btn-gift">🎁 Send as Gift</a>
+                </div>
             </div>
-
-            <div class="description-tooltip" th:text="${m.description}"></div>
-        </li>
-    </ul>
-
+        </div>
+    </div>
 </div>
-
-<script>
-    function showMusic() {
-        document.getElementById("musicList").style.display = "block";
-        document.getElementById("movieList").style.display = "none";
-    }
-
-    function showMovies() {
-        document.getElementById("musicList").style.display = "none";
-        document.getElementById("movieList").style.display = "block";
-    }
-
-    showMusic();
-</script>
 
 </body>
 </html>

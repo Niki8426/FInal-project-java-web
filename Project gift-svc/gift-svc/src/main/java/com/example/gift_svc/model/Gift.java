@@ -24,19 +24,32 @@ public class Gift {
     @Column(nullable = false)
     private UUID mediaId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // Автоматично поставяне на дата преди първоначален запис
     @PrePersist
-    public void onCreate() {
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
     public Gift() {
     }
 
+    // Constructor за улеснение при тестване/създаване
+    public Gift(String senderUsername, String receiverUsername, UUID mediaId) {
+        this.senderUsername = senderUsername;
+        this.receiverUsername = receiverUsername;
+        this.mediaId = mediaId;
+    }
+
     public UUID getId() {
         return id;
+    }
+
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getSenderUsername() {
@@ -65,5 +78,23 @@ public class Gift {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    // Добавяме сетър за createdAt само за нуждите на Hibernate/Jackson,
+    // въпреки че @PrePersist ще го презапише при нов запис.
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    // Полезно за логване в конзолата
+    @Override
+    public String toString() {
+        return "Gift{" +
+                "id=" + id +
+                ", sender='" + senderUsername + '\'' +
+                ", receiver='" + receiverUsername + '\'' +
+                ", mediaId=" + mediaId +
+                ", date=" + createdAt +
+                '}';
     }
 }

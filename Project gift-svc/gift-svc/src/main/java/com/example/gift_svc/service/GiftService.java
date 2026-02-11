@@ -6,9 +6,11 @@ import com.example.gift_svc.web.dto.GiftCreateRequest;
 import com.example.gift_svc.web.dto.GiftResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,4 +69,20 @@ public class GiftService {
         giftRepository.deleteById(id);
         log.info("Gift with ID: {} was successfully deleted from the history.", id);
     }
+
+
+    /**
+     * ТОЧКА 1: Автоматично почистване на записи над 1 година.
+     * Стартира се всяка вечер в 00:00 часа.
+     */
+    @Scheduled(cron = "0 0 0 * * *") // Изпълнява се всяка вечер в полунощ
+    @Transactional
+    public void deleteOldGifts() {
+        LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+        log.info("Starting scheduled cleanup: deleting gifts older than {}", oneYearAgo);
+
+        // Трябва да добавиш този метод в GiftRepository
+        giftRepository.deleteByCreatedAtBefore(oneYearAgo);
+    }
+
 }

@@ -121,4 +121,23 @@ public class HomeController {
 
         return "redirect:/home";
     }
+
+    @PostMapping("/playlist/remove/{id}")
+    public String removeFromPlaylist(@PathVariable UUID id,
+                                     @AuthenticationPrincipal UserData userData) {
+
+        // 1. Взимаме потребителя от базата чрез ID-то от сесията
+        User user = userService.findUserById(userData.getUserId());
+
+        // 2. Извикваме услугата за премахване на връзката между потребителя и медията
+        mediaItemService.removeFromPlaylist(user, id);
+
+        log.info("User {} removed item {} from their personal playlist.", user.getUsername(), id);
+
+        // 3. Пренасочваме обратно към началната страница
+        return "redirect:/home";
+    }
+
+
+
 }

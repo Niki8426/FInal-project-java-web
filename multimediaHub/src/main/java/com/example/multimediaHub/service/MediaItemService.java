@@ -148,4 +148,20 @@ public class MediaItemService {
     public MediaItem getActiveMedia() {
         return mediaItemRepository.findFirstByCurrentTrue().orElse(null);
     }
+
+    @Transactional
+    public void removeFromPlaylist(User user, UUID mediaId) {
+        // 1. Намираме медията, която потребителят иска да премахне
+        MediaItem mediaToRemove = mediaItemRepository.findById(mediaId)
+                .orElseThrow(() -> new IllegalArgumentException("Media not found"));
+
+        // 2. Премахваме я от списъка на потребителя
+        // Hibernate автоматично ще изтрие записа само от свързващата таблица (users_owned_media)
+        user.getOwnedMedia().removeIf(m -> m.getId().equals(mediaId));
+
+        // 3. Записваме промяната в потребителя
+        userRepository.save(user);
+
+        log.info("User {} removed {} from their playlist", user.getUsername(), mediaToRemove.getTitle());
+    }
 }

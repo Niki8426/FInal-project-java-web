@@ -1,14 +1,4 @@
-Извинявай за черния екран – вероятно се е получило заради липсващия CSRF обект, който Thymeleaf не успя да зареди.
 
-Ето твоя оригинален код, в който съм направил точно две неща:
-
-Добавих бутона "+ Add Media" в top-bar (горната лента).
-
-Премахнах стария "Админ Панел" (червената кутия), за да не се дублират.
-
-Всичко останало по дизайна, скриптовете и визуализатора е непокътнато.
-
-HTML
 <!DOCTYPE html>
 <html lang="bg" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -271,9 +261,53 @@ HTML
         list.innerHTML = "";
         currentList.forEach((m, i) => {
             const li = document.createElement("li");
-            li.textContent = m.title;
+            li.style.display = "flex";
+            li.style.justifyContent = "space-between";
+            li.style.alignItems = "center";
+
+            // Текстът на медията
+            const titleSpan = document.createElement("span");
+            titleSpan.textContent = m.title;
+            titleSpan.style.cursor = "pointer";
+            titleSpan.onclick = () => { currentIndex = i; player.loadVideoById(currentList[i].youtubeVideoId); render(); };
+
+            li.appendChild(titleSpan);
+
+            // Форма с бутон за изтриване
+            // Важно: Използваме стандартен POST, който Spring обработва лесно
+            const deleteForm = document.createElement("form");
+            deleteForm.method = "POST";
+            deleteForm.action = "/playlist/remove/" + m.id; // Пътят към твоя контролер
+
+            // Ръчно добавяме CSRF полето, тъй като сме в JS среда
+            const csrfMeta = document.querySelector('meta[name="_csrf"]');
+            if(csrfMeta) {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "_csrf";
+                input.value = csrfMeta.getAttribute("content");
+                deleteForm.appendChild(input);
+            }
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "🗑";
+            deleteBtn.style.background = "none";
+            deleteBtn.style.border = "none";
+            deleteBtn.style.color = "#ff5555";
+            deleteBtn.style.cursor = "pointer";
+            deleteBtn.style.fontSize = "16px";
+            deleteBtn.type = "submit";
+
+            deleteBtn.onclick = (e) => {
+                if(!confirm('Сигурни ли сте, че искате да премахнете "' + m.title + '"?')) {
+                    e.preventDefault();
+                }
+            };
+
+            deleteForm.appendChild(deleteBtn);
+            li.appendChild(deleteForm);
+
             if (i === currentIndex) li.classList.add("active");
-            li.onclick = () => { currentIndex = i; player.loadVideoById(currentList[i].youtubeVideoId); render(); };
             list.appendChild(li);
         });
     }

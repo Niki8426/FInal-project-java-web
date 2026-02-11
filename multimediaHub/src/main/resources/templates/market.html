@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Multimedia Market</title>
+    <title>Multimedia Market - Neon Hub</title>
     <style>
         body {
             background: url('/images/market.jpg') no-repeat center center fixed;
@@ -10,31 +10,34 @@
             color: white;
             font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
+            overflow-x: hidden;
         }
 
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             z-index: -1;
         }
 
-        /* Стил за бутона BACK */
+        /* Навигация */
         .back-nav {
-            position: absolute;
+            position: fixed;
             top: 20px;
             left: 20px;
+            z-index: 1000;
         }
 
         .btn-back {
             text-decoration: none;
             color: #00ff00;
             border: 1px solid #00ff00;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: bold;
             background: rgba(0, 255, 0, 0.1);
+            backdrop-filter: blur(5px);
             transition: all 0.3s ease;
             display: inline-block;
         }
@@ -42,109 +45,127 @@
         .btn-back:hover {
             background: #00ff00;
             color: black;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
         }
 
         .market-container {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(20, 20, 20, 0.7);
-            border-radius: 15px;
-            margin-top: 60px; /* Малко повече разстояние заради бутона горе */
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px 20px;
+            max-width: 1300px;
+            margin: 80px auto 40px auto;
+            background: rgba(15, 15, 15, 0.85);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
         }
 
         .balance-box {
             text-align: right;
             margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 12px;
+            border-right: 4px solid #00f2fe;
         }
 
         .section-title {
-            color: #00ff00;
-            border-bottom: 2px solid rgba(0, 255, 0, 0.3);
+            color: #00f2fe;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.3);
             padding-bottom: 10px;
-            margin-top: 40px;
+            margin-top: 50px;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .media-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px;
+            margin-top: 25px;
         }
 
         .media-card {
-            background: rgba(30, 30, 30, 0.8);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 15px;
+            padding: 18px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .media-card:hover {
-            border-color: #00ff00;
-            transform: translateY(-5px);
-            background: rgba(40, 40, 40, 0.9);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            border-color: #00f2fe;
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.2);
         }
 
-        .media-card img { width: 100%; border-radius: 8px; height: 280px; object-fit: cover; margin-bottom: 15px; }
+        .media-card img {
+            width: 100%;
+            border-radius: 10px;
+            height: 300px;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
 
-        .media-info h3 { margin: 10px 0 5px 0; font-size: 1.1em; height: 2.4em; overflow: hidden; color: #eee; }
+        .media-info h3 { margin: 10px 0; font-size: 1.2em; color: #fff; height: 1.4em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-        .price-tag { display: block; font-weight: bold; color: #ffcc00; font-size: 1.2em; margin-bottom: 15px; }
+        .price-tag { display: block; font-weight: bold; color: #00ff00; font-size: 1.3em; margin: 10px 0; text-shadow: 0 0 10px rgba(0,255,0,0.2); }
 
         .owned-badge {
             display: inline-block;
             color: #00ff00;
-            background: rgba(0, 255, 0, 0.15);
-            padding: 4px 10px;
-            border-radius: 4px;
+            background: rgba(0, 255, 0, 0.1);
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 0.85em;
             margin-bottom: 10px;
-            border: 1px solid rgba(0, 255, 0, 0.2);
+            border: 1px solid rgba(0, 255, 0, 0.3);
         }
 
-        .button-group { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+        .button-group { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
 
         .btn-buy {
-            background: #00ff00; color: black; border: none; padding: 10px;
-            border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;
-            transition: background 0.2s;
+            background: #00ff00; color: black; border: none; padding: 12px;
+            border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;
+            transition: 0.3s;
         }
-        .btn-buy:hover { background: #05cc05; }
+        .btn-buy:hover { background: #00cc00; transform: scale(1.02); }
 
         .btn-gift {
             background: transparent; color: #ff00ff; border: 1px solid #ff00ff;
-            padding: 9px; border-radius: 6px; cursor: pointer; text-decoration: none;
-            font-weight: bold; transition: all 0.2s;
+            padding: 11px; border-radius: 8px; cursor: pointer; text-decoration: none;
+            font-weight: bold; transition: all 0.3s; text-align: center;
         }
-        .btn-gift:hover { background: #ff00ff; color: white; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
+        .btn-gift:hover { background: #ff00ff; color: white; box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
     </style>
 </head>
 <body>
 
 <nav class="back-nav">
-    <a th:href="@{/home}" class="btn-back">⬅ Back to Home</a>
+    <a th:href="@{/home}" class="btn-back">⬅ Back to Player</a>
 </nav>
 
 <div class="market-container">
-    <h1 style="text-align: center; color: #00ff00; text-shadow: 0 0 15px rgba(0,255,0,0.3);">🌌 Multimedia Market</h1>
+    <h1 style="text-align: center; color: #00f2fe; text-shadow: 0 0 20px rgba(0,242,254,0.4); font-size: 2.5em; margin-top: 0;"> MEDIA MARKET</h1>
 
     <div class="balance-box">
-        <span style="color: #ccc;">User: </span>
-        <strong th:text="${user.username}" style="color: white;">User</strong> |
-        <span>Balance: </span>
-        <span style="color: #00ff00; font-weight: bold;" th:text="${user.balance} + ' USD'">0.00 USD</span>
+        <span style="color: #888;">Logged as: </span>
+        <strong th:text="${user.username}" style="color: white; font-size: 1.1em;">User</strong>
+        <span style="margin: 0 15px; color: #444;">|</span>
+        <span style="color: #888;">Wallet: </span>
+        <span style="color: #00ff00; font-weight: bold; font-size: 1.2em;" th:text="${#numbers.formatDecimal(user.balance, 1, 2)} + ' USD'">0.00 USD</span>
     </div>
 
     <h2 class="section-title">🎵 Music Discoveries</h2>
@@ -153,15 +174,19 @@
             <img th:src="${item.imageUrl}" th:alt="${item.title}">
             <div class="media-info">
                 <h3 th:text="${item.title}">Song Title</h3>
+
                 <div th:if="${ownedIds.contains(item.id)}">
-                    <span class="owned-badge">In Library ✅</span>
+                    <span class="owned-badge">Owned ✓</span>
                 </div>
+
                 <span class="price-tag" th:text="${item.price} + ' USD'">9.99 USD</span>
+
                 <div class="button-group">
-                    <form th:unless="${ownedIds.contains(item.id)}" th:action="@{/market/buy/{id}(id=${item.id})}" method="post">
+                    <form th:if="${!ownedIds.contains(item.id)}" th:action="@{/market/buy/{id}(id=${item.id})}" method="post">
                         <button type="submit" class="btn-buy">🛒 Buy for Me</button>
                     </form>
-                    <a th:href="@{/market/gift/{id}(id=${item.id})}" class="btn-gift">🎁 Send as Gift</a>
+
+                    <a th:href="@{/market/present/{id}(id=${item.id})}" class="btn-gift">🎁 Send as Gift</a>
                 </div>
             </div>
         </div>
@@ -173,15 +198,19 @@
             <img th:src="${item.imageUrl}" th:alt="${item.title}">
             <div class="media-info">
                 <h3 th:text="${item.title}">Movie Title</h3>
+
                 <div th:if="${ownedIds.contains(item.id)}">
-                    <span class="owned-badge">In Library ✅</span>
+                    <span class="owned-badge">Owned ✓</span>
                 </div>
+
                 <span class="price-tag" th:text="${item.price} + ' USD'">14.99 USD</span>
+
                 <div class="button-group">
-                    <form th:unless="${ownedIds.contains(item.id)}" th:action="@{/market/buy/{id}(id=${item.id})}" method="post">
+                    <form th:if="${!ownedIds.contains(item.id)}" th:action="@{/market/buy/{id}(id=${item.id})}" method="post">
                         <button type="submit" class="btn-buy">🛒 Buy for Me</button>
                     </form>
-                    <a th:href="@{/market/gift/{id}(id=${item.id})}" class="btn-gift">🎁 Send as Gift</a>
+
+                    <a th:href="@{/market/present/{id}(id=${item.id})}" class="btn-gift">🎁 Send as Gift</a>
                 </div>
             </div>
         </div>

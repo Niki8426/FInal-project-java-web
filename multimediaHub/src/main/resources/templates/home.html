@@ -1,150 +1,120 @@
-
 <!DOCTYPE html>
 <html lang="bg" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <title>Home - Neon Media Player</title>
     <style>
         body {
-            margin: 0;
-            min-height: 100vh;
+            margin: 0; min-height: 100vh;
             font-family: 'Segoe UI', Arial, sans-serif;
-            color: white;
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            transition: 0.5s;
-            background-color: #050505;
-            overflow-x: hidden;
+            color: white; background-size: cover; background-position: center;
+            background-attachment: fixed; transition: 0.5s;
+            background-color: #050505; overflow-x: hidden;
         }
-
         body.music-mode { background-image: url("/images/home.jpg"); }
         body.movie-mode { background-image: url("/images/cinema.jpg"); }
 
         .top-bar {
-            position: fixed;
-            top: 0; width: 100%; z-index: 1000;
+            position: fixed; top: 0; width: 100%; z-index: 1000;
             display: flex; justify-content: space-between;
             padding: 12px 25px; box-sizing: border-box;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(0,255,255,0.2);
         }
-
-        .nav-group { display: flex; gap: 12px; }
-
+        .nav-group { display: flex; gap: 12px; align-items: center; }
         .nav-btn {
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-            border: 1px solid rgba(255,255,255,0.2);
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
+            padding: 8px 16px; background: rgba(255,255,255,0.1);
+            color: white; border-radius: 6px; text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
+            font-size: 14px; transition: 0.3s; display: inline-flex; align-items: center; gap: 5px;
         }
         .nav-btn:hover { background: rgba(0,255,255,0.2); border-color: #00f2fe; }
         .logout-btn { color: #ff5555; border-color: rgba(255,85,85,0.3); }
 
         .main-layout {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            padding-top: 100px;
-            min-height: 80vh;
+            display: flex; justify-content: center; align-items: center;
+            gap: 40px; padding-top: 60px; min-height: 100vh; width: 100%; box-sizing: border-box;
         }
 
+        /* Visualizer Bars */
         .side-visualizer {
-            width: 100px;
-            height: 450px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 5px;
-            padding-bottom: 20px;
-            overflow: hidden;
+            width: 80px; height: 400px; background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px; display: flex; align-items: flex-end;
+            justify-content: center; gap: 5px; padding: 0 10px 20px 10px; flex-shrink: 0;
         }
-
         .vis-bar {
-            width: 7px;
-            background: linear-gradient(to top, #00f2fe 0%, #00ff00 100%);
-            border-radius: 4px;
-            height: 5px;
-            transition: height 0.05s ease;
+            width: 7px; background: linear-gradient(to top, #00f2fe 0%, #00ff00 100%);
+            border-radius: 4px; height: 5px; transition: height 0.05s ease;
         }
 
+        /* Player Container */
         .player-container {
-            width: 500px;
-            background: rgba(0, 0, 0, 0.85);
-            padding: 25px;
-            border-radius: 25px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.9);
-            border: 1px solid rgba(255,255,255,0.1);
+            width: 550px; background: rgba(0, 0, 0, 0.85); padding: 30px;
+            border-radius: 25px; box-shadow: 0 10px 50px rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.1); z-index: 2;
         }
-
         #player { width: 100%; height: 280px; border-radius: 15px; background: #000; margin-bottom: 15px; border: 1px solid #333; }
 
+        /* Modern Controls */
+        .controls {
+            display: flex; justify-content: center; align-items: center;
+            gap: 20px; margin-top: 20px;
+        }
+        .controls button {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; width: 50px; height: 50px; border-radius: 50%;
+            cursor: pointer; font-size: 18px; display: flex; align-items: center;
+            justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); outline: none;
+        }
+        #playBtn {
+            width: 65px; height: 65px; font-size: 24px;
+            background: rgba(0, 255, 0, 0.1); border-color: rgba(0, 255, 0, 0.3); color: #00ff00;
+        }
+        .controls button:hover {
+            background: rgba(0, 242, 254, 0.2); border-color: #00f2fe;
+            transform: scale(1.1); box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+        #playBtn:hover {
+            background: rgba(0, 255, 0, 0.2); border-color: #00ff00;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
+        }
+        .controls button:active { transform: scale(0.95); }
+
+        /* Playlist */
         .playlist {
             list-style: none; padding: 0; margin: 15px 0;
-            max-height: 110px; overflow-y: auto;
+            max-height: 130px; overflow-y: auto;
             background: rgba(255,255,255,0.03); border-radius: 10px;
         }
-        .playlist li { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        .playlist li { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .playlist li:hover { background: rgba(255,255,255,0.05); }
         .playlist li.active { background: rgba(0,255,0,0.1); color: #00ff00; border-left: 4px solid #00ff00; }
 
-        .controls { display: flex; gap: 10px; margin-top: 15px; }
-        .controls button {
-            flex: 1; padding: 12px; background: #1a1a1a; border: 1px solid #333;
-            color: white; border-radius: 10px; cursor: pointer; font-size: 1.2em;
-        }
-
+        /* Sidebars */
         .right-sidebar {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            width: 300px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            position: fixed; top: 80px; right: 20px; width: 300px; z-index: 999;
+            display: flex; flex-direction: column; gap: 15px;
         }
-
         .glass-panel {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(0,255,255,0.2);
-            border-radius: 20px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px);
+            border: 1px solid rgba(0,255,255,0.2); border-radius: 20px;
+            padding: 15px; display: flex; flex-direction: column;
         }
-
-        .gift-box { height: 250px; }
-        .wall-box { height: 480px; }
-
-        .scroll-area {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            padding-right: 5px;
-        }
-
+        .gift-box { height: 220px; }
+        .wall-box { height: 400px; }
+        .scroll-area { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; }
         .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.3); border-radius: 10px; }
 
         .wall-msg-item {
-            padding: 8px 10px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            font-size: 13px;
-            background: rgba(255,255,255,0.05);
-            border-left: 3px solid #00ff00;
-            word-wrap: break-word;
+            padding: 8px 10px; margin-bottom: 8px; border-radius: 8px;
+            font-size: 13px; background: rgba(255,255,255,0.05);
+            border-left: 3px solid #00ff00; word-wrap: break-word;
         }
     </style>
 </head>
@@ -156,7 +126,11 @@
         <a th:href="@{/market}" class="nav-btn">Market</a>
         <a th:href="@{/wallet}" class="nav-btn">Wallet</a>
         <a th:href="@{/settings}" class="nav-btn">Settings</a>
-        <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/add-media}" class="nav-btn" style="border-color: #00ff00; color: #00ff00;">+ Add Media</a>
+        <th:block sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/add-media}" class="nav-btn" style="border-color: #00ff00; color: #00ff00;">+ Add Media</a>
+            <a th:href="@{/admin/gifts}" class="nav-btn" style="border-color: #ff00ff; color: #ff00ff;">🎁 All Gifts</a>
+            <a th:href="@{/admin/users}" class="nav-btn" style="border-color: #ffcc00; color: #ffcc00;">👥 Users</a>
+        </th:block>
     </div>
     <form th:action="@{/logout}" method="post">
         <button type="submit" class="nav-btn logout-btn">Logout</button>
@@ -165,13 +139,11 @@
 
 <div class="main-layout">
     <div class="side-visualizer" id="vis-left"></div>
-
     <div class="player-container">
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <button class="nav-btn" style="flex:1" onclick="switchToMusic()">Music</button>
             <button class="nav-btn" style="flex:1" onclick="switchToMovies()">Movies</button>
         </div>
-
         <div id="player"></div>
         <ul class="playlist" id="playlist"></ul>
 
@@ -188,7 +160,6 @@
         </div>
         <p style="font-size: 10px; color: #555; text-align: center; margin-top: 10px;" id="statusText">Кликни за ефекти</p>
     </div>
-
     <div class="side-visualizer" id="vis-right"></div>
 </div>
 
@@ -196,11 +167,9 @@
     <div class="glass-panel gift-box">
         <h4 style="color: #00f2fe; margin-top: 0; text-align: center; font-size: 14px;">📨 Messages</h4>
         <div class="scroll-area" id="giftScroll">
-            <div th:each="msg : ${messages}" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border-left: 2px solid #00f2fe;">
+            <div th:each="msg : ${messages}" th:id="'msg-' + ${msg.id}" style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border-left: 2px solid #00f2fe;">
                 <span th:text="${msg.content}"></span>
-                <form th:action="@{/messages/delete/{id}(id=${msg.id})}" method="post" style="display:inline; float:right;">
-                    <button type="submit" style="color: red; background: none; border: none; cursor: pointer; font-weight: bold;">×</button>
-                </form>
+                <button th:data-id="${msg.id}" onclick="deleteMessage(this.getAttribute('data-id'))" style="color: red; background: none; border: none; cursor: pointer; float:right; font-weight: bold;">×</button>
             </div>
         </div>
     </div>
@@ -213,8 +182,8 @@
                 <span th:text="${wm.content}"></span>
             </div>
         </div>
-        <form th:action="@{/home/wall/post}" method="post" style="display: flex; gap: 5px;">
-            <input type="text" name="content" required placeholder="Напиши нещо..." style="flex:1; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 8px; padding: 10px; font-size: 13px; outline: none;">
+        <form id="wallForm" onsubmit="sendWallMessage(event)" style="display: flex; gap: 5px;">
+            <input type="text" id="wallInput" name="content" required placeholder="Напиши нещо..." style="flex:1; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 8px; padding: 10px; font-size: 13px; outline: none;">
             <button type="submit" class="nav-btn" style="padding: 5px 12px;">🚀</button>
         </form>
     </div>
@@ -225,18 +194,65 @@
 <script th:inline="javascript">
     const musicList = [[${musicList}]] || [];
     const movieList = [[${movieList}]] || [];
+    const currentUsername = [[${#authentication.name}]];
 </script>
 
 <script>
-    function autoScroll() {
-        const giftScroll = document.getElementById('giftScroll');
-        const wallScroll = document.getElementById('wallScroll');
-        if(giftScroll) giftScroll.scrollTop = giftScroll.scrollHeight;
-        if(wallScroll) wallScroll.scrollTop = wallScroll.scrollHeight;
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+    // --- AJAX ЗА СТЕНАТА ---
+    async function sendWallMessage(event) {
+        event.preventDefault();
+        const input = document.getElementById('wallInput');
+        const content = input.value;
+        if (!content.trim()) return;
+
+        try {
+            const response = await fetch('/home/wall/post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', [csrfHeader]: csrfToken },
+                body: 'content=' + encodeURIComponent(content)
+            });
+            if (response.ok) {
+                const wallScroll = document.getElementById('wallScroll');
+                const div = document.createElement('div');
+                div.className = 'wall-msg-item';
+                div.innerHTML = `<strong style="color: #00f2fe;">${currentUsername}</strong>: <span>${content}</span>`;
+                wallScroll.appendChild(div);
+                wallScroll.scrollTop = wallScroll.scrollHeight;
+                input.value = '';
+            }
+        } catch (e) { console.error(e); }
     }
 
-    window.addEventListener('load', autoScroll);
+    // --- AJAX ЗА ИЗТРИВАНЕ НА ПЕСЕН ---
+    async function removeMedia(id, element) {
+        if(!confirm('Премахване?')) return;
+        try {
+            const response = await fetch('/playlist/remove/' + id, {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken }
+            });
+            if (response.ok) element.closest('li').remove();
+        } catch (e) { console.error(e); }
+    }
 
+    // --- AJAX ЗА ИЗТРИВАНЕ НА СЪОБЩЕНИЕ ---
+    async function deleteMessage(id) {
+        try {
+            const response = await fetch('/messages/delete/' + id, {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken }
+            });
+            if (response.ok) {
+                const el = document.getElementById('msg-' + id);
+                if(el) el.remove();
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    // --- YOUTUBE LOGIC ---
     let player, currentList = [], currentIndex = 0;
     let audioContext, analyser, dataArray, isVisOn = false;
 
@@ -261,53 +277,21 @@
         list.innerHTML = "";
         currentList.forEach((m, i) => {
             const li = document.createElement("li");
-            li.style.display = "flex";
-            li.style.justifyContent = "space-between";
-            li.style.alignItems = "center";
+            if (i === currentIndex) li.className = "active";
 
-            // Текстът на медията
             const titleSpan = document.createElement("span");
             titleSpan.textContent = m.title;
-            titleSpan.style.cursor = "pointer";
+            titleSpan.style.flex = "1";
             titleSpan.onclick = () => { currentIndex = i; player.loadVideoById(currentList[i].youtubeVideoId); render(); };
 
+            const delBtn = document.createElement("span");
+            delBtn.innerHTML = "🗑";
+            delBtn.style.color = "#ff5555";
+            delBtn.style.marginLeft = "10px";
+            delBtn.onclick = (e) => { e.stopPropagation(); removeMedia(m.id, delBtn); };
+
             li.appendChild(titleSpan);
-
-            // Форма с бутон за изтриване
-            // Важно: Използваме стандартен POST, който Spring обработва лесно
-            const deleteForm = document.createElement("form");
-            deleteForm.method = "POST";
-            deleteForm.action = "/playlist/remove/" + m.id; // Пътят към твоя контролер
-
-            // Ръчно добавяме CSRF полето, тъй като сме в JS среда
-            const csrfMeta = document.querySelector('meta[name="_csrf"]');
-            if(csrfMeta) {
-                const input = document.createElement("input");
-                input.type = "hidden";
-                input.name = "_csrf";
-                input.value = csrfMeta.getAttribute("content");
-                deleteForm.appendChild(input);
-            }
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "🗑";
-            deleteBtn.style.background = "none";
-            deleteBtn.style.border = "none";
-            deleteBtn.style.color = "#ff5555";
-            deleteBtn.style.cursor = "pointer";
-            deleteBtn.style.fontSize = "16px";
-            deleteBtn.type = "submit";
-
-            deleteBtn.onclick = (e) => {
-                if(!confirm('Сигурни ли сте, че искате да премахнете "' + m.title + '"?')) {
-                    e.preventDefault();
-                }
-            };
-
-            deleteForm.appendChild(deleteBtn);
-            li.appendChild(deleteForm);
-
-            if (i === currentIndex) li.classList.add("active");
+            li.appendChild(delBtn);
             list.appendChild(li);
         });
     }
@@ -316,20 +300,10 @@
     function next() { if(currentList.length > 0) { currentIndex = (currentIndex + 1) % currentList.length; player.loadVideoById(currentList[currentIndex].youtubeVideoId); render(); } }
     function prev() { if(currentList.length > 0) { currentIndex = (currentIndex - 1 + currentList.length) % currentList.length; player.loadVideoById(currentList[currentIndex].youtubeVideoId); render(); } }
 
-    function switchToMusic() {
-        document.body.className="music-mode";
-        currentList = musicList;
-        currentIndex = 0;
-        if(currentList.length > 0) { player.loadVideoById(currentList[0].youtubeVideoId); render(); }
-    }
+    function switchToMusic() { document.body.className="music-mode"; currentList = musicList; currentIndex = 0; if(currentList.length > 0) { player.loadVideoById(currentList[0].youtubeVideoId); render(); } }
+    function switchToMovies() { document.body.className="movie-mode"; currentList = movieList; currentIndex = 0; if(currentList.length > 0) { player.loadVideoById(currentList[0].youtubeVideoId); render(); } }
 
-    function switchToMovies() {
-        document.body.className="movie-mode";
-        currentList = movieList;
-        currentIndex = 0;
-        if(currentList.length > 0) { player.loadVideoById(currentList[0].youtubeVideoId); render(); }
-    }
-
+    // --- VISUALIZER ---
     function createBars() {
         const containers = [document.getElementById('vis-left'), document.getElementById('vis-right')];
         containers.forEach(c => { for(let i=0; i<8; i++) { const b = document.createElement('div'); b.className='vis-bar'; c.appendChild(b); }});
@@ -351,15 +325,23 @@
     }
     function draw() {
         requestAnimationFrame(draw);
+        if(!isVisOn) return;
         analyser.getByteFrequencyData(dataArray);
         const bars = document.querySelectorAll('.vis-bar');
         for(let i=0; i<8; i++) {
-            let h = (dataArray[i*2]/255) * 400 + 5;
+            let h = (dataArray[i*2]/255) * 350 + 5;
             if(bars[i]) bars[i].style.height = h + 'px';
             if(bars[i+8]) bars[i+8].style.height = h + 'px';
         }
     }
+
     window.addEventListener('click', initVis);
+    window.onload = () => {
+        const gs = document.getElementById('giftScroll');
+        const ws = document.getElementById('wallScroll');
+        if(gs) gs.scrollTop = gs.scrollHeight;
+        if(ws) ws.scrollTop = ws.scrollHeight;
+    }
 </script>
 </body>
 </html>

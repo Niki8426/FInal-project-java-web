@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - All Gifts</title>
+  <style>
+    body {
+      margin: 0; background-color: #050505; color: white;
+      font-family: 'Segoe UI', Arial, sans-serif; padding: 40px;
+    }
+    .container {
+      max-width: 1100px; margin: auto;
+      background: rgba(0, 0, 0, 0.9); padding: 30px;
+      border-radius: 20px; border: 1px solid rgba(0, 242, 254, 0.3);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 1);
+    }
+    h2 { color: #00f2fe; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(255,255,255,0.02); }
+    th { border-bottom: 2px solid #00f2fe; padding: 15px; text-align: left; color: #ffcc00; text-transform: uppercase; font-size: 13px; }
+    td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+
+    .row-gift:hover { background: rgba(0, 242, 254, 0.05); }
+
+    .sender { color: #00ff00; font-weight: bold; }
+    .receiver { color: #ff00ff; font-weight: bold; }
+    .media-name { color: #00f2fe; font-weight: 500; }
+    .uuid { font-family: 'Courier New', monospace; font-size: 11px; color: #666; }
+
+    .back-link {
+      text-decoration: none; color: #ccc; font-size: 14px;
+      display: inline-flex; align-items: center; gap: 5px; transition: 0.3s;
+    }
+    .back-link:hover { color: #00f2fe; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <a href="/home" class="back-link">⬅ Обратно към Начало</a>
+
+  <h2>📊 Дневник на всички подаръци</h2>
+
+  <table>
+    <thead>
+    <tr>
+      <th>ID на подарък</th>
+      <th>Подател</th>
+      <th>Получател</th>
+      <th>Име на медия</th>
+      <th>Дата и час</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="g : ${allGifts}" class="row-gift">
+      <td class="uuid" th:text="${g.id}"></td>
+      <td class="sender" th:text="${g.senderUsername}"></td>
+      <td class="receiver" th:text="${g.receiverUsername}"></td>
+      <td class="media-name" th:text="${g.mediaTitle != null ? g.mediaTitle : 'Неизвестна медия'}"></td>
+      <td th:text="${#temporals.format(g.createdAt, 'dd.MM.yyyy HH:mm:ss')}"></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div th:if="${#lists.isEmpty(allGifts)}" style="text-align: center; padding: 40px; color: #666;">
+    Няма намерени записи в базата данни.
+  </div>
+</div>
+
+</body>
+</html>

@@ -7,10 +7,12 @@ import com.example.multimediaHub.model.UserMessage;
 import com.example.multimediaHub.repository.MediaItemRepository;
 import com.example.multimediaHub.repository.UserMessageRepository;
 import com.example.multimediaHub.repository.UserRepository;
+import com.example.multimediaHub.web.dto.AllGiftDto;
 import com.example.multimediaHub.web.dto.CreateGiftRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -83,4 +85,24 @@ public class GiftService {
                 java.time.LocalDateTime.now()
         );
     }
+
+    public List<AllGiftDto> fetchAllGifts() {
+        // 1. Взимаме списъка от микросървиса
+        List<AllGiftDto> gifts = giftClient.getAllGifts();
+
+        // 2. Попълваме имената на медиите
+        for (AllGiftDto gift : gifts) {
+            mediaItemRepository.findById(gift.getMediaId()).ifPresent(media -> {
+                gift.setMediaTitle(media.getTitle());
+            });
+
+            // Ако медията е изтрита, можеш да сложиш име по подразбиране
+            if (gift.getMediaTitle() == null) {
+                gift.setMediaTitle("Unknown Media (Deleted)");
+            }
+        }
+
+        return gifts;
+    }
+
 }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Manage Users</title>
+  <style>
+    body { margin: 0; background-color: #050505; color: white; font-family: 'Segoe UI', sans-serif; padding: 40px; }
+    .container { max-width: 1200px; margin: auto; background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 20px; border: 1px solid #00f2fe; }
+    h2 { color: #00f2fe; text-align: center; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { border-bottom: 2px solid #00f2fe; padding: 15px; text-align: left; color: #ffcc00; }
+    td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+    /* Бутони */
+    .btn { padding: 8px 15px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; text-decoration: none; display: inline-block; }
+    .btn-delete { background: #ff0055; color: white; margin-right: 5px; }
+    .btn-add { background: #00ff00; color: black; }
+    .btn-delete:hover { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+    .btn-add:hover { background: #00cc00; box-shadow: 0 0 10px #00ff00; }
+
+    .role-badge { background: #555; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="/home" style="color: #00f2fe; text-decoration: none;">⬅ Назад</a>
+  <h2>👥 Управление на потребители</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>Потребител</th>
+      <th>Имейл</th>
+      <th>Парола</th>
+      <th>Баланс</th>
+      <th>Роля</th>
+      <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+      <td th:text="${user.username}" style="font-weight: bold;"></td>
+      <td th:text="${user.email}"></td>
+      <td>••••••••</td> <td th:text="${user.balance} + ' лв.'" style="color: #00ff00;"></td>
+      <td><span class="role-badge" th:text="${user.role}"></span></td>
+      <td>
+        <div style="display: flex;">
+          <form th:action="@{/admin/users/delete}" method="post" onsubmit="return confirm('Сигурни ли сте?')">
+            <input type="hidden" name="userId" th:value="${user.id}"/>
+            <button type="submit" class="btn btn-delete">Изтрий</button>
+          </form>
+
+          <form th:action="@{/admin/users/add-balance}" method="post">
+
+
+            <input type="hidden" name="userId" th:value="${user.id}"/>
+            <button type="submit" class="btn btn-add">+5 лв.</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

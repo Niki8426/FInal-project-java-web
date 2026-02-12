@@ -30,4 +30,6 @@ public interface MediaItemRepository extends JpaRepository<MediaItem, UUID> {
             @Param("ownedIds") List<UUID> ownedIds
     );
 
+    List<MediaItem> findAllByIdIn(List<UUID> ids);
+
 }

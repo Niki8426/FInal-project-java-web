@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -124,5 +125,25 @@ public class UserService implements UserDetailsService {
         // 4. Записваме промените
 
         userRepository.save(user);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+
+
+    @Transactional
+    public void addBonusBalance(UUID userId, BigDecimal amount) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Потребителят не е намерен!"));
+
+        user.setBalance(user.getBalance().add(amount));
+        userRepository.save(user);
+    }
+
+@Transactional
+    public void deleteById(UUID userId) {
+        userRepository.deleteById(userId);
     }
 }

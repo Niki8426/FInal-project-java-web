@@ -1,11 +1,14 @@
 package com.example.gift_svc.web;
 
+import com.example.gift_svc.repository.GiftRepository;
 import com.example.gift_svc.service.GiftService;
+import com.example.gift_svc.web.dto.AllGiftDto;
 import com.example.gift_svc.web.dto.GiftCreateRequest;
 import com.example.gift_svc.web.dto.GiftResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +22,12 @@ public class GiftController {
 
     private static final Logger log = LoggerFactory.getLogger(GiftController.class);
     private final GiftService giftService;
+    private final GiftRepository giftRepository;
 
-    public GiftController(GiftService giftService) {
+    @Autowired
+    public GiftController(GiftService giftService, GiftRepository giftRepository) {
         this.giftService = giftService;
+        this.giftRepository = giftRepository;
     }
 
     /**
@@ -54,5 +60,19 @@ public class GiftController {
         log.info("REST request to delete gift log with ID: {}", id);
         giftService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/all")
+    public List<AllGiftDto> getAllGifts() {
+        return giftRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(gift -> new AllGiftDto(
+                        gift.getId(),
+                        gift.getSenderUsername(),
+                        gift.getReceiverUsername(),
+                        gift.getMediaId(),
+                        gift.getCreatedAt()
+                ))
+                .toList();
     }
 }

@@ -4,6 +4,7 @@ import com.example.gift_svc.model.Gift;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,4 +16,5 @@ public interface GiftRepository extends JpaRepository<Gift, UUID> {
     // Този метод ще генерира: DELETE FROM gifts WHERE created_at < ?
     void deleteByCreatedAtBefore(LocalDateTime expiryDate);
 
+    Collection<Gift> findAllByOrderByCreatedAtDesc();
 }

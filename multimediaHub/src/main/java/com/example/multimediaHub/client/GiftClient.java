@@ -20,6 +20,4 @@ public interface GiftClient {
 
     @GetMapping("/api/gifts/all")
     List<AllGiftDto> getAllGifts();
-
-
 }

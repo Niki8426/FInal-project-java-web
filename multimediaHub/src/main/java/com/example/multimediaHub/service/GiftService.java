@@ -12,6 +12,7 @@ import com.example.multimediaHub.web.dto.CreateGiftRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,75 +35,72 @@ public class GiftService {
     }
 
     @Transactional
-    public void sendGift(String senderUsername,
-                         String receiverUsername,
-                         UUID mediaId,
-                         String message) {
-
+    public void sendGift(String senderUsername, String receiverUsername, UUID mediaId, String message) {
         User sender = userRepository.findByUsername(senderUsername)
-                .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Изпращачът не е намерен"));
 
         User receiver = userRepository.findByUsername(receiverUsername)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Получателят не е намерен"));
 
         MediaItem mediaItem = mediaItemRepository.findById(mediaId)
-                .orElseThrow(() -> new IllegalArgumentException("Media not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Медията не е намерена"));
 
+        // 1. Проверка на баланса
         if (sender.getBalance().compareTo(mediaItem.getPrice()) < 0) {
-            throw new IllegalArgumentException("Not enough balance");
+            throw new IllegalArgumentException("Нямате достатъчна наличност");
         }
 
-        // баланс
+        // 2. Транзакция в монолита
         sender.setBalance(sender.getBalance().subtract(mediaItem.getPrice()));
         receiver.getOwnedMedia().add(mediaItem);
 
         userRepository.save(sender);
         userRepository.save(receiver);
 
-        // съобщение в монолита
+        // 3. Съобщение (Система за известия)
         UserMessage userMessage = new UserMessage();
         userMessage.setReceiver(receiver);
         userMessage.setContent(buildMessage(sender, mediaItem, message));
         userMessageRepository.save(userMessage);
 
-        // gift event (само след успех)
-        giftClient.createGift(
-                new CreateGiftRequest(
-                        sender.getUsername(),
-                        receiver.getUsername(),
-                        mediaItem.getId(),
-                        userMessage.getContent()
-                )
-        );
+
+        // Обвиваме в try-catch, за да не се провали подаръкът в монолита, ако gift-svc е спрян
+        try {
+            giftClient.createGift(new CreateGiftRequest(
+                    sender.getUsername(),
+                    receiver.getUsername(),
+                    mediaItem.getId(),
+                    userMessage.getContent()
+            ));
+        } catch (Exception e) {
+            System.err.println("⚠️ Микросървисът gift-svc не е достъпен. Подаръкът е записан само локално.");
+        }
     }
 
     private String buildMessage(User sender, MediaItem mediaItem, String userMessage) {
-        return String.format(
-                "From: %s | Media: %s | %s | %s",
-                sender.getUsername(),
-                mediaItem.getTitle(),
-                userMessage,
-                java.time.LocalDateTime.now()
-        );
+        return String.format("От: %s | Медия: %s | Съобщение: %s",
+                sender.getUsername(), mediaItem.getTitle(), userMessage);
     }
 
     public List<AllGiftDto> fetchAllGifts() {
-        // 1. Взимаме списъка от микросървиса
-        List<AllGiftDto> gifts = giftClient.getAllGifts();
+        try {
+            List<AllGiftDto> gifts = giftClient.getAllGifts();
+            if (gifts == null) return new ArrayList<>();
 
-        // 2. Попълваме имената на медиите
-        for (AllGiftDto gift : gifts) {
-            mediaItemRepository.findById(gift.getMediaId()).ifPresent(media -> {
-                gift.setMediaTitle(media.getTitle());
-            });
-
-            // Ако медията е изтрита, можеш да сложиш име по подразбиране
-            if (gift.getMediaTitle() == null) {
-                gift.setMediaTitle("Unknown Media (Deleted)");
+            for (AllGiftDto gift : gifts) {
+                mediaItemRepository.findById(gift.getMediaId()).ifPresent(media -> {
+                    gift.setMediaTitle(media.getTitle());
+                });
+                if (gift.getMediaTitle() == null) {
+                    gift.setMediaTitle("Изтрита медия");
+                }
             }
+            return gifts;
+        } catch (Exception e) {
+            System.err.println("❌ Грешка при извличане на подаръци: " + e.getMessage());
+            return new ArrayList<>(); // Връщаме празен списък, за да не гърми UI-а
         }
-
-        return gifts;
     }
+
 
 }

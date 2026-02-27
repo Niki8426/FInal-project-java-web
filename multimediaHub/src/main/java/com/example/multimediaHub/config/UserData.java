@@ -30,12 +30,9 @@ public class UserData implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String finalRole;
 
-        // 1. Проверяваме дали ролята вече започва с "ROLE_"
         if (this.role.startsWith("ROLE_")) {
-            // да - просто я правим с големи букви
             finalRole = this.role.toUpperCase();
         } else {
-            //  не - добавяме префикса и я правим с големи букви
             finalRole = "ROLE_" + this.role.toUpperCase();
         }
 
@@ -54,22 +51,14 @@ public class UserData implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
-    }
+    public boolean isEnabled() { return true; }
 }

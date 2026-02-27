@@ -25,4 +25,36 @@ public class WalletDto {
     @NotBlank(message = "CVV е задължителен.")
     @Size(min = 3, max = 4, message = "CVV трябва да е 3 или 4 цифри.")
     private String cvv;
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public String getCardExpiry() {
+        return cardExpiry;
+    }
+
+    public void setCardExpiry(String cardExpiry) {
+        this.cardExpiry = cardExpiry;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
+    }
 }

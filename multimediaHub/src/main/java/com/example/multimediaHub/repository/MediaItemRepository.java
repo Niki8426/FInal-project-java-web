@@ -18,18 +18,18 @@ public interface MediaItemRepository extends JpaRepository<MediaItem, UUID> {
 
     List<MediaItem> findAllByTypeOrderByYearDesc(MediaType type);
 
-    @Query("""
-        SELECT m
-        FROM MediaItem m
-        WHERE m.type = :type
-          AND m.id NOT IN :ownedIds
-        ORDER BY m.year DESC
-    """)
-    List<MediaItem> findMarketItems(
-            @Param("type") MediaType type,
-            @Param("ownedIds") List<UUID> ownedIds
-    );
+    // Добавяме защита: ако потребителят няма нищо купено, връщаме всички предмети от този тип
+    default List<MediaItem> findSafeMarketItems(MediaType type, List<UUID> ownedIds) {
+        if (ownedIds == null || ownedIds.isEmpty()) {
+            return findAllByTypeOrderByYearDesc(type);
+        }
+        return findMarketItems(type, ownedIds);
+    }
+
+    @Query("SELECT m FROM MediaItem m WHERE m.type = :type AND m.id NOT IN :ownedIds ORDER BY m.year DESC")
+    List<MediaItem> findMarketItems(@Param("type") MediaType type, @Param("ownedIds") List<UUID> ownedIds);
+
+
 
     List<MediaItem> findAllByIdIn(List<UUID> ids);
-
 }

@@ -9,7 +9,8 @@ import java.util.UUID;
 public class MediaItem {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID) // Явно указваме UUID стратегията за стабилност
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     @Column(nullable = false)
@@ -17,16 +18,18 @@ public class MediaItem {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MediaType type; // "movie" или "music"
+    private MediaType type;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 19, scale = 2) // Подсигуряваме точността на парите
     private BigDecimal price;
 
     private Integer year;
     private String genre;
+
+    @Column(length = 500) // URL адресите понякога са дълги
     private String imageUrl;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT") // TEXT е по-сигурно от String(1000) за дълги описания
     private String description;
 
     @Column(nullable = false)
@@ -35,13 +38,14 @@ public class MediaItem {
     @Column(nullable = false)
     private boolean current = false;
 
-
-
+    // Празен конструктор за Hibernate
     public MediaItem() {
     }
 
-    public MediaItem(UUID id, String title, MediaType type, BigDecimal price, Integer year, String genre, String imageUrl, String description, String youtubeVideoId, boolean current) {
-        this.id = id;
+    // Ремонтиран конструктор (махнахме ID-то, защото Hibernate го генерира автоматично)
+    public MediaItem(String title, MediaType type, BigDecimal price, Integer year,
+                     String genre, String imageUrl, String description,
+                     String youtubeVideoId, boolean current) {
         this.title = title;
         this.type = type;
         this.price = price;
@@ -53,83 +57,34 @@ public class MediaItem {
         this.current = current;
     }
 
-    public UUID getId() {
-        return id;
-    }
+    // Стандартни Getters и Setters...
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getTitle() {
-        return title;
-    }
+    public MediaType getType() { return type; }
+    public void setType(MediaType type) { this.type = type; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
-    public MediaType getType() {
-        return type;
-    }
+    public Integer getYear() { return year; }
+    public void setYear(Integer year) { this.year = year; }
 
-    public void setType(MediaType type) {
-        this.type = type;
-    }
+    public String getGenre() { return genre; }
+    public void setGenre(String genre) { this.genre = genre; }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public Integer getYear() {
-        return year;
-    }
+    public String getYoutubeVideoId() { return youtubeVideoId; }
+    public void setYoutubeVideoId(String youtubeVideoId) { this.youtubeVideoId = youtubeVideoId; }
 
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getYoutubeVideoId() {
-        return youtubeVideoId;
-    }
-
-    public void setYoutubeVideoId(String youtubeVideoId) {
-        this.youtubeVideoId = youtubeVideoId;
-    }
-
-    public boolean isCurrent() {
-        return current;
-    }
-
-    public void setCurrent(boolean current) {
-        this.current = current;
-    }
+    public boolean isCurrent() { return current; }
+    public void setCurrent(boolean current) { this.current = current; }
 }

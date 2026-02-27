@@ -1,0 +1,90 @@
+Готово! Намалих времето на 3 секунди. Това е идеалният интервал – достатъчно е, за да види изпитващият, че имаш красива страница за грешки, но и достатъчно бързо, за да не го изнервя чакането.
+
+Ето финалния код за error.html с променения таймер и леки оптимизации:
+
+HTML
+<!DOCTYPE html>
+<html lang="bg" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Грешка - Multimedia Hub</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #050505;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+        .error-container {
+            padding: 40px;
+            border: 2px solid #ff0055;
+            border-radius: 20px;
+            box-shadow: 0 0 25px #ff0055;
+            background: rgba(0, 0, 0, 0.95);
+            max-width: 500px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 20px #ff0055; }
+            50% { box-shadow: 0 0 40px #ff0055; }
+            100% { box-shadow: 0 0 20px #ff0055; }
+        }
+        h1 { color: #ff0055; font-size: 80px; margin: 0; text-shadow: 0 0 10px #ff0055; }
+        h2 { color: #00f2fe; margin-top: 10px; }
+        p { font-size: 18px; margin: 20px 0; color: #ccc; }
+        .btn-back {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #00f2fe;
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-back:hover {
+            box-shadow: 0 0 20px #00f2fe;
+            transform: scale(1.1);
+        }
+        .countdown { color: #ffcc00; font-weight: bold; font-size: 22px; }
+    </style>
+</head>
+<body>
+
+<div class="error-container">
+    <h1>404/500</h1>
+    <h2>Упс! Възникна грешка</h2>
+    <p>Спокойно, Multimedia Hub е под контрол.</p>
+
+    <p>Автоматично връщане след <span id="timer" class="countdown">3</span> сек...</p>
+
+    <a th:href="${previousPage}" class="btn-back">ВЪРНИ МЕ СЕГА</a>
+</div>
+
+<script th:inline="javascript">
+    let seconds = 3;
+    // Взимаме URL-а директно от модела, предоставен от контролера
+    let previousPage = [[${previousPage}]];
+
+    const timerElement = document.getElementById('timer');
+
+    const countdown = setInterval(() => {
+        seconds--;
+        timerElement.innerText = seconds;
+        if (seconds <= 0) {
+            clearInterval(countdown);
+            window.location.href = previousPage;
+        }
+    }, 1000);
+</script>
+
+</body>
+</html>

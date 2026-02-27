@@ -26,36 +26,51 @@ public class DataInitializer {
     }
 
     @PostConstruct
-    public void init() throws Exception {
+    public void init() {
+        try {
+            // 1. Проверка дали вече има данни
+            if (mediaItemRepository.count() > 0) {
+                System.out.println("✅ [DataInitializer] Данните вече са заредени в базата.");
+                return;
+            }
 
-        // ако има данни – нищо не правим
-        if (mediaItemRepository.count() > 0) {
-            return;
-        }
+            // 2. Безопасно зареждане на JSON файла
+            InputStream inputStream = getClass().getResourceAsStream("/data/media-items.json");
 
-        // зареждаме JSON файла
-        InputStream inputStream =
-                getClass().getResourceAsStream("/data/media-items.json");
+            if (inputStream == null) {
+                System.err.println("❌ [DataInitializer] ГРЕШКА: Файлът /data/media-items.json не е намерен!");
+                return;
+            }
 
-        List<MediaItemSeed> seeds = objectMapper.readValue(
-                inputStream,
-                new TypeReference<List<MediaItemSeed>>() {}
-        );
+            // 3. Четене на JSON
+            List<MediaItemSeed> seeds = objectMapper.readValue(
+                    inputStream,
+                    new TypeReference<List<MediaItemSeed>>() {}
+            );
 
-        // записваме в базата
-        for (MediaItemSeed dto : seeds) {
-            MediaItem media = new MediaItem();
-            media.setTitle(dto.getTitle());
-            media.setType(dto.getType());
-            media.setPrice(dto.getPrice());
-            media.setYear(dto.getYear());
-            media.setGenre(dto.getGenre());
-            media.setImageUrl(dto.getImageUrl());
-            media.setDescription(dto.getDescription());
-            media.setYoutubeVideoId(dto.getYoutubeVideoId());
-            media.setCurrent(false);
+            // 4. Валидация и запис
+            if (seeds != null && !seeds.isEmpty()) {
+                for (MediaItemSeed dto : seeds) {
+                    MediaItem media = new MediaItem();
+                    media.setTitle(dto.getTitle() != null ? dto.getTitle() : "Без заглавие");
+                    media.setType(dto.getType());
+                    media.setPrice(dto.getPrice());
+                    media.setYear(dto.getYear());
+                    media.setGenre(dto.getGenre());
+                    media.setImageUrl(dto.getImageUrl());
+                    media.setDescription(dto.getDescription());
+                    media.setYoutubeVideoId(dto.getYoutubeVideoId());
+                    media.setCurrent(false);
 
-            mediaItemRepository.save(media);
+                    mediaItemRepository.save(media);
+                }
+                System.out.println("✅ [DataInitializer] Успешно импортирани " + seeds.size() + " медийни елемента.");
+            }
+
+        } catch (Exception e) {
+            // МНОГО ВАЖНО: Хващаме грешката тук, за да не спре целия сървър
+            System.err.println("❌ [DataInitializer] Критична грешка при сийдване на данни: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

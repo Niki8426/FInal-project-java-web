@@ -27,4 +27,14 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(errors);
     }
+
+    @ExceptionHandler(com.example.gift_svc.exception.GiftNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(com.example.gift_svc.exception.GiftNotFoundException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(error);
+    }
 }

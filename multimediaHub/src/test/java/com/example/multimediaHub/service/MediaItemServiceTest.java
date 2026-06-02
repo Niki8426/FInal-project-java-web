@@ -23,14 +23,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+// @ExtendWith(MockitoExtension.class): Инициализира Mockito тестовата рамка за JUnit 5.
+// Грижи се за автоматичното управление, създаване и зануляване на фалшивите обекти (Mocks) между отделните тестове.
 @ExtendWith(MockitoExtension.class)
 class MediaItemServiceTest {
 
+    // @Mock: Създава софтуерна симулация на MediaItemRepository за изолиране на реалния достъп до MySQL.
     @Mock
     private MediaItemRepository mediaItemRepository;
+
+    // @Mock: Симулира UserRepository, за да управлява транзакциите по балансите и плейлистите без реална база.
     @Mock
     private UserRepository userRepository;
 
+    // @InjectMocks: Създава истински обект от класа MediaItemService и автоматично инжектира в него
+    // двата дефинирани по-горе фалшиви репозитори компонента.
     @InjectMocks
     private MediaItemService mediaItemService;
 
@@ -38,6 +45,8 @@ class MediaItemServiceTest {
     private MediaItem testMedia;
     private UUID mediaId;
 
+    // @BeforeEach: Изпълнява се автоматично преди стартирането на всеки индивидуален @Test метод.
+    // Използва се за подготовка на чисти, изолирани тестови субекти (User и MediaItem) в паметта.
     @BeforeEach
     void setUp() {
         mediaId = UUID.randomUUID();
@@ -60,13 +69,18 @@ class MediaItemServiceTest {
     void getAllItemsByType_ShouldCallRepository() {
         // Тестваме дали методът вика репозиторито (кеш анотацията се тества интеграционно, тук тестваме логиката)
         mediaItemService.getAllItemsByType(MediaType.MOVIE);
+
+        // verify: Проверява дали методът на репозиторито е бил извикан точно с параметър MediaType.MOVIE.
         verify(mediaItemRepository).findAllByTypeOrderByYearDesc(MediaType.MOVIE);
     }
 
     @Test
     void getActiveMedia_ShouldReturnNull_WhenNoneFound() {
         // Покриваме ".orElse(null)" в метода getActiveMedia
+        // Симулираме сценарий, в който базата данни връща празна стойност (Optional.empty()) за активен уеб банер.
         when(mediaItemRepository.findFirstByCurrentTrue()).thenReturn(Optional.empty());
+
+        // assertNull: Уверяваме се софтуерно, че при липса на текуща медия, методът връща безопасно null стойност.
         assertNull(mediaItemService.getActiveMedia());
     }
 
@@ -75,22 +89,28 @@ class MediaItemServiceTest {
     @Test
     void getMarketItems_ShouldReturnAll_WhenUserHasNoMedia() {
         // Тестваме: if (ownedIds.isEmpty())
+        // Когато потребителят е нов и няма закупени продукти, магазинът трябва да зареди пълния каталог.
         when(mediaItemRepository.findAllByTypeOrderByYearDesc(MediaType.MOVIE))
                 .thenReturn(List.of(testMedia));
 
         List<MediaItem> result = mediaItemService.getMarketItems(testUser, MediaType.MOVIE);
 
+        // assertFalse: Потвърждаваме, че върнатият списък с продукти не е празен.
         assertFalse(result.isEmpty());
+        // verify: Уверяваме се, че е извикан методът за пълно извличане без допълнителни SQL филтри по ID.
         verify(mediaItemRepository).findAllByTypeOrderByYearDesc(MediaType.MOVIE);
     }
 
     @Test
     void getMarketItems_ShouldFilter_WhenUserHasMedia() {
         // Тестваме случая, в който потребителят вече има медия (вика се findMarketItems)
+        // Добавяме тестовия продукт в колекцията на потребителя (Else клона на бизнес логиката).
         testUser.getOwnedMedia().add(testMedia);
 
         mediaItemService.getMarketItems(testUser, MediaType.MOVIE);
 
+        // verify: Потвърждаваме, че системата задейства филтриращата SQL заявка (findMarketItems),
+        // за да скрие вече закупените филми/песни от пазара на потребителя.
         verify(mediaItemRepository).findMarketItems(eq(MediaType.MOVIE), anyList());
     }
 
@@ -99,35 +119,43 @@ class MediaItemServiceTest {
     @Test
     void buyMedia_ShouldReturnFalse_WhenAlreadyOwned() {
         // Тестваме: if (alreadyOwned) return false;
+        // Симулираме опит за повторна покупка на продукт, който вече е наличен в потребителския акаунт.
         testUser.getOwnedMedia().add(testMedia);
         when(mediaItemRepository.findById(mediaId)).thenReturn(Optional.of(testMedia));
 
         boolean result = mediaItemService.buyMedia(testUser, mediaId);
 
+        // assertFalse: Системата трябва софтуерно да откаже транзакцията (false), предотвратявайки дублиране.
         assertFalse(result);
     }
 
     @Test
     void buyMedia_ShouldReturnFalse_WhenBalanceInsufficient() {
         // Тестваме: if (user.getBalance() < price) return false;
-        testUser.setBalance(BigDecimal.ONE); // Има само 1 лев
+        // Променяме баланса на потребителя на 1.00 лев (при цена на медията от 20.00 лева).
+        testUser.setBalance(BigDecimal.ONE);
         when(mediaItemRepository.findById(mediaId)).thenReturn(Optional.of(testMedia));
 
         boolean result = mediaItemService.buyMedia(testUser, mediaId);
 
+        // assertFalse: Транзакцията се блокира поради липса на средства.
         assertFalse(result);
     }
 
     @Test
     void buyMedia_ShouldSucceed_WhenEverythingOk() {
-        // Тестваме успешната покупка
+        // Тестваме успешната покупка (Happy Path сценарий)
         when(mediaItemRepository.findById(mediaId)).thenReturn(Optional.of(testMedia));
 
         boolean result = mediaItemService.buyMedia(testUser, mediaId);
 
+        // assertTrue: Потвърждаваме, че покупката преминава успешно.
         assertTrue(result);
-        assertEquals(new BigDecimal("80.00"), testUser.getBalance()); // 100 - 20
+        // assertEquals: Математическа проверка дали балансът е намален точно с цената на продукта (100 - 20 = 80).
+        assertEquals(new BigDecimal("80.00"), testUser.getBalance());
+        // assertTrue: Проверяваме дали продуктът е добавен успешно в Many-to-Many колекцията на потребителя.
         assertTrue(testUser.getOwnedMedia().contains(testMedia));
+        // verify: Уверяваме се, че актуализираното състояние на профила е записано в базата данни чрез userRepository.
         verify(userRepository).save(testUser);
     }
 
@@ -138,11 +166,13 @@ class MediaItemServiceTest {
         // Тестваме филтрирането по тип MUSIC
         MediaItem music = new MediaItem();
         music.setType(MediaType.MUSIC);
+        // Зареждаме в плейлиста една песен (MUSIC) и един филм (MOVIE)
         testUser.getOwnedMedia().add(music);
-        testUser.getOwnedMedia().add(testMedia); // Това е MOVIE
+        testUser.getOwnedMedia().add(testMedia);
 
         List<MediaHome> result = mediaItemService.getUserMusicForHome(testUser);
 
+        // assertEquals: Стрийм потокът трябва да отсее само музиката, връщайки списък с размер точно 1.
         assertEquals(1, result.size());
     }
 
@@ -150,8 +180,10 @@ class MediaItemServiceTest {
 
     @Test
     void addMedia_ShouldSaveCorrectly() {
-        // Тестваме добавянето на нова медия
+        // Тестваме добавянето на нова медия през администраторския уеб панел.
         mediaItemService.addMedia("Title", "id", MediaType.MOVIE, BigDecimal.TEN, 2024, "Genre", "url", "desc");
+
+        // verify: Проверява дали изграденият MediaItem обект се подава коректно на репозиторито за MySQL съхранение.
         verify(mediaItemRepository).save(any(MediaItem.class));
     }
 
@@ -163,15 +195,19 @@ class MediaItemServiceTest {
 
         mediaItemService.removeFromPlaylist(testUser, mediaId);
 
+        // assertTrue: Уверяваме се, че след операцията личната колекция на потребителя остава напълно празна.
         assertTrue(testUser.getOwnedMedia().isEmpty());
+        // verify: Потвърждаваме, че редуцираният списък е персистиран обратно в базата данни.
         verify(userRepository).save(testUser);
     }
 
     @Test
     void buyMedia_ShouldThrowException_WhenMediaNotFound() {
         // Покриваме розовия ред: .orElseThrow(() -> new IllegalArgumentException("Media not found"))
+        // Симулираме злонамерен или грешен опит за покупка на несъществуващ уникален идентификатор (UUID).
         when(mediaItemRepository.findById(any())).thenReturn(Optional.empty());
 
+        // assertThrows: Гарантира, че бизнес логиката реагира със защитно изключение (IllegalArgumentException) при празен Optional.
         assertThrows(IllegalArgumentException.class, () ->
                 mediaItemService.buyMedia(testUser, UUID.randomUUID()));
     }
@@ -183,21 +219,21 @@ class MediaItemServiceTest {
      */
     @Test
     void testGetUserMoviesForHome_ShouldFilterAndMapCorrectly() {
-        // Подготвяме филм
+        // Подготвяме филм за тестване
         MediaItem movie = new MediaItem();
         movie.setId(UUID.randomUUID());
         movie.setTitle("Interstellar");
         movie.setType(MediaType.MOVIE);
         movie.setYoutubeVideoId("video123");
 
-        // Подготвяме музика (която трябва да бъде филтрирана/прескочена)
+        // Подготвяме музика (която трябва да бъде филтрирана/прескочена от Java Stream-а)
         MediaItem music = new MediaItem();
         music.setType(MediaType.MUSIC);
 
         User user = new User();
         user.setOwnedMedia(List.of(movie, music));
 
-        // Изпълнение
+        // Изпълнение на тестваната уеб-логика
         List<MediaHome> result = mediaItemService.getUserMoviesForHome(user);
 
         // Проверки (Assert)
@@ -217,6 +253,8 @@ class MediaItemServiceTest {
 
         List<MediaHome> result = mediaItemService.getUserMoviesForHome(user);
 
+        // assertTrue: Проверява дали методът връща празна и безопасна за Thymeleaf инстанция на списък,
+        // вместо да предизвика срив на уеб страницата.
         assertTrue(result.isEmpty(), "Списъкът трябва да е празен");
     }
 
@@ -243,7 +281,7 @@ class MediaItemServiceTest {
      */
     @Test
     void testGetById_ShouldReturnMedia_WhenExists() {
-        // Given
+        // Given (Подготовка)
         UUID id = UUID.randomUUID();
         MediaItem expectedMedia = new MediaItem();
         expectedMedia.setId(id);
@@ -251,10 +289,10 @@ class MediaItemServiceTest {
 
         when(mediaItemRepository.findById(id)).thenReturn(Optional.of(expectedMedia));
 
-        // When
+        // When (Действие)
         MediaItem result = mediaItemService.getById(id);
 
-        // Then
+        // Then (Проверка)
         assertNotNull(result);
         assertEquals("Inception", result.getTitle());
         assertEquals(id, result.getId());
@@ -266,12 +304,13 @@ class MediaItemServiceTest {
      */
     @Test
     void testGetById_ShouldThrowException_WhenNotFound() {
-        // Given
+        // Given (Подготовка)
         UUID id = UUID.randomUUID();
         when(mediaItemRepository.findById(id)).thenReturn(Optional.empty());
 
-        // When & Then
-        // Понеже ползваш .orElseThrow() без аргументи, Spring/Java хвърля NoSuchElementException
+        // When & Then (Действие и Проверка)
+        // Понеже ползваш .orElseThrow() без аргументи, Spring/Java автоматично хвърля NoSuchElementException.
+        // Уверяваме се софтуерно, че това изключение бива уловено правилно при липсващ ресурс.
         assertThrows(java.util.NoSuchElementException.class, () -> {
             mediaItemService.getById(id);
         });

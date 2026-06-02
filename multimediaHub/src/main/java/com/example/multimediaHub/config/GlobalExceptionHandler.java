@@ -8,6 +8,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Този метод работи като глобален спасителен пояс за цялото приложение.
+    // Когато някъде в кода гръмне неочаквана грешка (Exception), този метод я улавя веднага.
+    // Логва я в конзолата, за да се вижда при разработка, закача едно скрито съобщение за потребителя
+    // и го пренасочва обратно на уеб страницата, на която е бил преди секунда (или на "/home", ако няма история),
+    // за да не му излиза грозната стандартна софтуерна страница за грешка на Spring.
     @ExceptionHandler(Exception.class)
     public String handleException(Exception ex, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         // Записваме грешката в лога, за да я виждаш в конзолата

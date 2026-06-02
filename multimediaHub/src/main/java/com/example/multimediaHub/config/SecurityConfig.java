@@ -14,6 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // Това е главният филтър на сигурността. Тук разпределяме кой на кои страници има право да ходи.
+    // Настройваме свободния достъп за гости (регистрация, логин, дизайн файлове),
+    // затваряме "/home" за логнати хора и изолираме "/admin" секцията само за потребители с роля ADMIN.
+    // Също така тук казваме как да работи формата за вход, какво става при излизане (изтриване на сесията)
+    // и подсигуряваме моделa на уеб сесиите, за да не се бъркат страниците в Thymeleaf.
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -56,6 +61,9 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Този метод ни дава енкодера за пароли (BCrypt).
+    // Използваме го навсякъде при регистрация или промяна на профила, за да може паролите
+    // да се записват в MySQL базата като защитени, сигурни хешове, а не като чист текст.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

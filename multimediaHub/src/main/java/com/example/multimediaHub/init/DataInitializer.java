@@ -6,6 +6,8 @@ import com.example.multimediaHub.web.dto.MediaItemSeed;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -13,11 +15,14 @@ import java.io.InputStream;
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(name = "app.init.enabled", havingValue = "true", matchIfMissing = true)
 public class DataInitializer {
 
     private final MediaItemRepository mediaItemRepository;
     private final ObjectMapper objectMapper;
 
+    // С този конструктор Spring автоматично ни налива репозиторито и ObjectMapper-а,
+    // за да можем да си бачкаме с базата и да четем файлове.
     @Autowired
     public DataInitializer(MediaItemRepository mediaItemRepository,
                            ObjectMapper objectMapper) {
@@ -25,6 +30,9 @@ public class DataInitializer {
         this.objectMapper = objectMapper;
     }
 
+    // Този метод се задейства автоматично веднага след като обектите се сглобят в паметта.
+    // Отива до папка resources, намира файла media-items.json и ако базата данни е празна,
+    // прочита всички филми и песни от JSON-а и ги налива накуп, за да има какво да покажем в каталога.
     @PostConstruct
     public void init() {
         try {

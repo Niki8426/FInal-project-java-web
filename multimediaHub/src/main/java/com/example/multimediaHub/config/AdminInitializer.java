@@ -12,6 +12,9 @@ import java.math.BigDecimal;
 @Configuration
 public class AdminInitializer {
 
+    // Този метод се задейства сам веднага щом приложението тръгне.
+    // Върти една бърза проверка в базата данни и ако види, че все още няма потребител с име "admin",
+    // го създава на място с готови служебни данни, за да има с какво да се логнем веднага.
     @Bean
     CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {

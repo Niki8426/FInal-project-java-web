@@ -5,11 +5,17 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
+// Класът тества MediaItem — основния модел (Entity) в нашето приложение, който репрезентира
+// филмите и песните в MySQL базата данни. Този Unit тест гарантира, че данните се капсулират
+// и пренасят правилно в паметта чрез POJO структурата (конструктори, гетери и сетери).
 class MediaItemTest {
 
+    // @Test: Тества пълния софтуерен конструктор с параметри и съответните му гетери.
+    // Това е критично, когато сървис слоят (MediaItemService) създава нови продукти директно от аргументи.
     @Test
     void testMediaItemFullConstructorAndGetters() {
-        // Arrange
+        // Arrange (Подготовка):
+        // Задаваме твърди тестови стойности за абсолютно всички полета на мултимедийния продукт.
         String title = "Inception";
         MediaType type = MediaType.MOVIE;
         BigDecimal price = new BigDecimal("14.99");
@@ -20,10 +26,13 @@ class MediaItemTest {
         String youtubeId = "abc12345";
         boolean isCurrent = true;
 
-        // Act
+        // Act (Действие):
+        // Извикваме пълния конструктор на класа, за да конструираме обекта MediaItem в оперативната памет.
         MediaItem item = new MediaItem(title, type, price, year, genre, imageUrl, description, youtubeId, isCurrent);
 
-        // Assert - Покриваме конструктора с параметри и всички съответни гетери
+        // Assert (Проверка):
+        // assertAll: Изпълнява групово софтуерни твърдения. Уверяваме се, че конструкторът правилно
+        // е разпределил подадените аргументи в съответните вътрешни полета на обекта и гетерите ги връщат без промяна.
         assertAll("Constructor validation",
                 () -> assertEquals(title, item.getTitle()),
                 () -> assertEquals(type, item.getType()),
@@ -37,12 +46,16 @@ class MediaItemTest {
         );
     }
 
+    // @Test: Тества поведението на празния (Default) конструктор и абсолютно всички налични сетери.
+    // Hibernate задължително изисква празен конструктор, за да може софтуерно да рефлектира и извлича записи от MySQL таблиците.
     @Test
     void testMediaItemEmptyConstructorAndSetters() {
-        // 1. Тестваме ПРАЗНИЯ конструктор
+        // 1. Тестваме ПРАЗНИЯ конструктор:
+        // Инстанцираме обекта без първоначални данни — точно както прави Hibernate, когато чете ред от базата.
         MediaItem item = new MediaItem();
 
-        // 2. Тестваме СЕТЕРИТЕ един по един
+        // 2. Тестваме СЕТЕРИТЕ един по един:
+        // Наливаме софтуерно тестови стойности във всяко едно от полетата, за да проверим дали мутаторите работят правилно.
         UUID id = UUID.randomUUID();
         item.setId(id);
         item.setTitle("Song 1");
@@ -55,7 +68,8 @@ class MediaItemTest {
         item.setYoutubeVideoId("vid");
         item.setCurrent(false);
 
-        // 3. Тестваме ГЕТЕРИТЕ за потвърждение на покритието
+        // 3. Тестваме ГЕТЕРИТЕ за потвърждение на покритието:
+        // Използваме груповия JUnit механизъм, за да докажем, че сетерите успешно са записали данните в private полетата на класа.
         assertAll("Setters validation",
                 () -> assertEquals(id, item.getId()),
                 () -> assertEquals("Song 1", item.getTitle()),

@@ -56,7 +56,7 @@ class UserServiceIntegrationTest {
      * Интеграционен тест за Spring Security съвместимост.
      * Верифицира, че loadUserByUsername успешно извлича запис от базата данни
      * и го трансформира правилно в нашия потребителски UserData клас,
-     * пренасяйки коректно UUID и ролята.
+     * пренасяйки коректно UUID и ролята....
      */
     @Test
     void loadUserByUsername_ShouldReturnUserDataWhenUserExists() {
@@ -72,7 +72,7 @@ class UserServiceIntegrationTest {
     /**
      * Интеграционен тест за липсващ потребител в Spring Security среда.
      * Верифицира хвърлянето на UsernameNotFoundException при подаване
-     * на несъществуващ в базата данни username.
+     * на несъществуващ в базата данни username...
      */
     @Test
     void loadUserByUsername_ShouldThrowExceptionWhenUserNotFound() {
@@ -84,7 +84,7 @@ class UserServiceIntegrationTest {
     /**
      * Интеграционен тест за процеса на регистрация.
      * Проверява дали извикването на registerUser успешно записва данните,
-     * криптира паролата чрез PasswordEncoder и залага началния баланс.
+     * криптира паролата чрез PasswordEncoder и залага началния баланс...
      */
     @Test
     void registerUser_ShouldHashPasswordAndSaveUserSuccessfully() {
@@ -109,7 +109,7 @@ class UserServiceIntegrationTest {
     /**
      * Интеграционен тест за трансакционна защита при грешна парола.
      * Верифицира, че при несъответствие между парола и потвърждение,
-     * софтуерът задейства изключение и предотвратява запис на невалидни данни.
+     * софтуерът задейства изключение и предотвратява запис на невалидни данни....
      */
     @Test
     void registerUser_ShouldThrowExceptionWhenPasswordsDoNotMatch() {

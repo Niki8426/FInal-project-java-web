@@ -41,7 +41,7 @@ class AdminController {
 
     // @GetMapping("/add-media"): Слуша за HTTP GET заявки на адрес "/admin/add-media".
     // Методът зарежда страницата, съдържаща формата за добавяне на нови филми или песни.
-    // Връща стринга "add-media", което подканва Thymeleaf да рендерира файла "add-media.html" от папка templates.
+    // Връща стринга "add-media", което подканва Thymeleaf да рендерира файла "add-media.html" от папка templates..
     @GetMapping("/add-media")
     public String addMediaPage() {
         return "add-media";
@@ -68,7 +68,7 @@ class AdminController {
     }
 
     // @GetMapping("/gifts"): Слуша за HTTP GET заявки на адрес "/admin/gifts".
-    // Приема обекта Model на Spring MVC, който служи за пренос на данни от Java кода към HTML интерфейса.
+    // Приема обекта Model на Spring MVC, който служи за пренос на данни от Java кода към HTML интерфейса..
     @GetMapping("/gifts")
     public String viewAllGifts(Model model) {
         // Извиква външния сървис, за да дръпне пълния списък с подаръци от базата или микросървиса.
